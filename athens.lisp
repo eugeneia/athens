@@ -5,6 +5,15 @@
 (defvar *debug* nil
   "Debug mode.")
 
+(defmacro with-flexi-use-value (&body body)
+  "Bind FLEXI-STREAM's USE-VALUE restart during BODY."
+  `(handler-bind
+       ((external-format-encoding-error
+         #'(lambda (condition)
+             (declare (ignore condition))
+             (invoke-restart 'use-value #\Replacement_Character))))
+     ,@body))
+
 (defun headers (date)
   "Construct headers for «If-Modified-Since» request for DATE and
 includes «Accept-Charset» to favor UTF-8."
@@ -15,11 +24,20 @@ includes «Accept-Charset» to favor UTF-8."
   "Return HTTP response body of URL or NIL if it hasn't been
 modified since DATE."
   (multiple-value-bind (body status)
-      (http-request url :additional-headers (headers date))
+      (with-flexi-use-value
+        (http-request url :additional-headers (headers date)))
     (case status
       (200 body)
       (304 nil)
-      (otherwise (error "Could not retrieve ~a: Status ~a." url status)))))
+      (otherwise
+       (error "Could not retrieve ~a: Status ~a." url status)))))
+
+(defun decode (data)
+  "Try to decode DATA to a string if necessary."
+  (etypecase data
+    (string data)
+    ((array (unsigned-byte 8)) (with-flexi-use-value
+                                 (octets-to-string data)))))
 
 (defmacro with-skip-errors (identifier &body body)
   "Skip and log errors for IDENTIFIER during BODY."
@@ -41,17 +59,6 @@ list of logged item hashes."
                           t))
      when recorded-p
      collect item-hash))
-
-(defun decode (data)
-  "Try to decode DATA to a string if necessary."
-  (etypecase data
-    (string data)
-    ((array (unsigned-byte 8))
-     (handler-bind
-         ((external-format-encoding-error
-           #'(lambda (condition)
-               (invoke-restart 'use-value #\Replacement_Character))))
-       (octets-to-string data :external-format :utf-8)))))
 
 (defun import-feed (url &optional (date 0))
   "Import feed at URL and return import log unless it has not been
