@@ -1,0 +1,10 @@
+;;;; ATHENS example configuration.
+
+:database (:host "localhost"
+           :port 5432 ; Optional, defaults to 5432.
+           :user "postgres"
+           :password "password"
+           :name "athens" ; Optional, defaults to "athens".
+           :use-ssl :yes ; Optional, defaults to :NO.
+           )
+

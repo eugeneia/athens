@@ -5,5 +5,13 @@
   :author "Max Rottenkolber <max@mr.gy>"
   :license "GNU AGPL"
   :components ((:file "packages")
-               (:file "hash" :depends-on ("packages")))
-  :depends-on ("trivial-feed" "trivial-utf-8" "ironclad" "drakma"))
+               (:file "hash" :depends-on ("packages"))
+               (:file "store" :depends-on ("packages"))
+               (:file "athens" :depends-on ("packages" "hash" "store")))
+  :depends-on ("trivial-feed"
+               "flexi-streams"
+               "ironclad"
+               "drakma"
+               "cl-fad"
+               "postmodern"
+               "simple-date"))

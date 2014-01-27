@@ -2,37 +2,42 @@
 
 (defpackage athens.hash
   (:documentation "Hashing routines for feeds and feed items.")
-  (:use :ironclad :cl :trivial-utf-8)
+  (:use :ironclad
+        :cl
+        :flexi-streams)
   (:shadow :null) ; Shadow IRONCLAD's NULL with CL's.
   (:export :feed-hash
            :feed-item-hash))
 
-(defpackage athens.io
-  (:documentation "Persistent logging and records I/O.")
-  (:use :cl :athens.hash)
-  (:export :open-store
-           :with-store
-           :log-item
-           :log-import
-           :log-failure
-           :record-feed
-           :purge-feed
-           :read-item
-           :read-feed
-           :read-imports
-           :read-failures))
-
-(defpackage athens.import
-  (:documentation "Syndication feed importer.")
-  (:use :cl :athens.io :drakma)
-  (:export :import-feed))
+(defpackage athens.store
+  (:documentation "Persistent logging and records.")
+  (:use :cl
+        :simple-date
+        :postmodern)
+  (:export :with-database
+           :create-feed-table
+           :feed-index
+           :insert-feed
+           :update-feed
+           :get-feed
+           :create-item-table
+           :item-recorded-p
+           :record-item
+           :get-item
+           :create-log-table
+           :log-imports
+           :get-imports))
 
 (defpackage athens
   (:documentation "News archiver for syndication feeds.")
-  (:use :cl :athens.io :athens.import)
-  (:export :add-feed
-           :remove-feed
-           :update-archive
-           :archive-report
-           :start-archive-daemon
-           :stop-archive-daemon))
+  (:use :cl
+        :athens.hash
+        :athens.store
+        :trivial-feed
+        :drakma
+        :net.telent.date
+        :flexi-streams)
+  (:export :with-configuration
+           :initialize-database
+           :add-feed
+           :update-archive))
