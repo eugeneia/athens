@@ -44,4 +44,5 @@
            :initialize-database
            :add-feed
            :remove-feed
-           :update-archive))
+           :update-archive
+           :archive-log))

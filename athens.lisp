@@ -120,3 +120,16 @@ modified since DATE, in that case return NIL."
             collect import-log)))
     (when imports
       (log-imports imports))))
+
+(defun archive-log (&optional (start 0) end)
+  "Return combined imports log ranging from START to END dates."
+  (let ((table (make-hash-table :test #'equal))
+        (imports (get-imports start end)))
+    (loop for import in imports do
+         (loop for (feed items) in import do
+              (if (gethash feed table)
+                  (setf (gethash feed table)
+                        (append (gethash feed table items)))
+                  (setf (gethash feed table) items))))
+    (loop for feed being the hash-keys of table
+         collect (list feed (gethash feed table)))))
