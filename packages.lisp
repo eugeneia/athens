@@ -6,7 +6,7 @@
         :cl
         :flexi-streams)
   (:shadow :null) ; Shadow IRONCLAD's NULL with CL's.
-  (:export :feed-hash
+  (:export :url-hash
            :feed-item-hash))
 
 (defpackage athens.store
