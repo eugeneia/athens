@@ -90,11 +90,6 @@ modified since DATE, in that case return NIL."
               (list url item-hashes))))
         (format *debug-io* "~&Skipping ~a: Not modified.~%" url))))
 
-(defmacro with-configuration (configuration &body body)
-  "Execute BODY with CONFIGURATION."
-  `(with-database (getf ,configuration :database)
-     ,@body))
-
 (defun initialize-database ()
   "Initialize database (needs to be called once to setup an empty
 datatabase)."
