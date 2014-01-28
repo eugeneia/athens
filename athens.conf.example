@@ -8,3 +8,4 @@
            :use-ssl :yes ; Optional, defaults to :NO.
            )
 
+:debug nil ; Optional, defaults to NIL.
