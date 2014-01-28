@@ -1,4 +1,4 @@
-;;;; ATHENS.IMPORT: Feed importer.
+;;;; Feed archiver.
 
 (in-package :athens)
 
@@ -6,7 +6,7 @@
   "Debug mode.")
 
 (defmacro with-configuration (configuration &body body)
-  "Run BODY using CONFIGURATION."
+  "Evaluate BODY using CONFIGURATION."
   (let ((o!conf (gensym "conf")))
     `(let* ((,o!conf ,configuration)
             (*debug* (getf ,o!conf :debug)))
@@ -14,7 +14,7 @@
          ,@body))))
 
 (defmacro with-configuration-file (path &body body)
-  "Run BODY using configuration from PATH."
+  "Evaluate BODY using configuration from PATH."
   `(with-configuration (import-configuration ,path)
      ,@body))
 
@@ -73,7 +73,7 @@ modified since DATE."
   `(if (not *debug*)
        (handler-case (progn ,@body)
          (error (condition)
-           (format *debug-io* "~&Skipping ~a because: ~S ~a~%"
+           (format *error-output* "~&Skipping ~a because: ~S ~a~%"
                    ,identifier condition condition)))
        (progn ,@body)))
 
