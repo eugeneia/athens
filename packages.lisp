@@ -33,11 +33,13 @@
   (:use :cl
         :athens.hash
         :athens.store
+        :configuration
         :trivial-feed
         :drakma
         :net.telent.date
         :flexi-streams)
   (:export :with-configuration
+           :with-configuration-file
            :initialize-database
            :add-feed
            :update-archive))

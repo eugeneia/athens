@@ -9,6 +9,7 @@
                (:file "store" :depends-on ("packages"))
                (:file "athens" :depends-on ("packages" "hash" "store")))
   :depends-on ("trivial-feed"
+               "configuration"
                "flexi-streams"
                "ironclad"
                "drakma"
