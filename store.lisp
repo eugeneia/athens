@@ -42,6 +42,13 @@
     (when result
       (values (read-from-string (caar result))))))
 
+(defprepared delete-feed%
+    (:delete-from 'feed :where (:= 'hash '$1)))
+
+(defun delete-feed (hash)
+  (delete-feed% hash)
+  (values))
+
 (defun create-item-table ()
   (execute (sql (:create-table item
                   ((hash :type string :primary-key t)

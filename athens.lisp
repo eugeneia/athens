@@ -25,6 +25,15 @@ datatabase)."
   (create-item-table)
   (create-log-table)
   (values))
+
+(defun add-feed (url)
+  "Add feed at URL to archive."
+  (insert-feed (url-hash url) `(:source ,url :date 0)))
+
+(defun remove-feed (feed-hash)
+  "Remove feed by FEED-HASH."
+  (delete-feed feed-hash))
+
 (defmacro with-flexi-use-value (&body body)
   "Bind FLEXI-STREAM's USE-VALUE restart during BODY."
   `(handler-bind

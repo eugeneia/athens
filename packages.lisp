@@ -20,6 +20,7 @@
            :insert-feed
            :update-feed
            :get-feed
+           :delete-feed
            :create-item-table
            :item-recorded-p
            :record-item
@@ -42,4 +43,5 @@
            :with-configuration-file
            :initialize-database
            :add-feed
+           :remove-feed
            :update-archive))
