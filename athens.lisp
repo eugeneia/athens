@@ -18,6 +18,13 @@
   `(with-configuration (import-configuration ,path)
      ,@body))
 
+(defun initialize-database ()
+  "Initialize database (needs to be called once to setup an empty
+datatabase)."
+  (create-feed-table)
+  (create-item-table)
+  (create-log-table)
+  (values))
 (defmacro with-flexi-use-value (&body body)
   "Bind FLEXI-STREAM's USE-VALUE restart during BODY."
   `(handler-bind
@@ -80,33 +87,24 @@ modified since DATE, in that case return NIL."
     (if body
         (destructuring-bind (&key items link date title description)
             (parse-feed (decode body))
-          (let ((item-hashes (record-new-items items url)))
-            (update-feed url (make-feed nil
-                                        :link link
-                                        :date date
-                                        :title title
-                                        :description description))
+          (let* ((feed-hash (url-hash url))
+                 (item-hashes (record-new-items items feed-hash)))
+            (update-feed feed-hash
+                         (list :source url
+                               :link link
+                               :date date
+                               :title title
+                               :description description))
             (when item-hashes
-              (list url item-hashes))))
-        (format *debug-io* "~&Skipping ~a: Not modified.~%" url))))
-
-(defun initialize-database ()
-  "Initialize database (needs to be called once to setup an empty
-datatabase)."
-  (create-feed-table)
-  (create-item-table)
-  (create-log-table)
-  (values))
-
-(defun add-feed (url)
-  "Add feed at URL to archive."
-  (insert-feed url '(:date 0)))
+              (list feed-hash item-hashes))))
+        (format *error-output* "~&Skipping ~a: Not modified.~%" url))))
 
 (defun update-archive ()
   "Log new items for every feed archived."
   (let ((imports
-         (loop for url in (feed-index)
-               for feed = (get-feed url)
+         (loop for feed-hash in (feed-index)
+               for feed = (get-feed feed-hash)
+               for url = (getf feed :source)
                for import-log = (with-skip-errors url
                                   (import-feed url (getf feed :date)))
             when import-log

@@ -14,31 +14,31 @@
 
 (defun create-feed-table ()
   (execute (sql (:create-table feed
-                  ((url :type string :primary-key t)
+                  ((hash :type string :primary-key t)
                    (datum :type string))))))
 
 (defun feed-index ()
-  (mapcar #'car (query (sql (:select 'url :from 'feed)))))
+  (mapcar #'car (query (sql (:select 'hash :from 'feed)))))
 
 (defprepared insert-feed%
-    (:insert-into 'feed :set 'url '$1 'datum '$2))
+    (:insert-into 'feed :set 'hash '$1 'datum '$2))
 
-(defun insert-feed (url feed)
-  (insert-feed% url (prin1-to-string feed))
+(defun insert-feed (hash feed)
+  (insert-feed% hash (prin1-to-string feed))
   (values))
 
 (defprepared update-feed%
-    (:update 'feed :set 'datum '$2 :where (:= 'url '$1)))
+    (:update 'feed :set 'datum '$2 :where (:= 'hash '$1)))
 
-(defun update-feed (url feed)
-  (update-feed% url (prin1-to-string feed))
+(defun update-feed (hash feed)
+  (update-feed% hash (prin1-to-string feed))
   (values))
 
 (defprepared get-feed%
-    (:select 'datum :from 'feed :where (:= 'url '$1)))
+    (:select 'datum :from 'feed :where (:= 'hash '$1)))
 
-(defun get-feed (url)
-  (let ((result (get-feed% url)))
+(defun get-feed (hash)
+  (let ((result (get-feed% hash)))
     (when result
       (values (read-from-string (caar result))))))
 
