@@ -5,6 +5,19 @@
 (defvar *debug* nil
   "Debug mode.")
 
+(defmacro with-configuration (configuration &body body)
+  "Run BODY using CONFIGURATION."
+  (let ((o!conf (gensym "conf")))
+    `(let* ((,o!conf ,configuration)
+            (*debug* (getf ,o!conf :debug)))
+       (with-database (getf ,o!conf :database)
+         ,@body))))
+
+(defmacro with-configuration-file (path &body body)
+  "Run BODY using configuration from PATH."
+  `(with-configuration (import-configuration ,path)
+     ,@body))
+
 (defmacro with-flexi-use-value (&body body)
   "Bind FLEXI-STREAM's USE-VALUE restart during BODY."
   `(handler-bind
@@ -105,4 +118,3 @@ datatabase)."
             collect import-log)))
     (when imports
       (log-imports imports))))
-      
