@@ -124,7 +124,7 @@
     (:update 'global-date :set 'timestamp '$1
              :where (:= 'key "global-date")))
 
-(defun update-global-date (date)
+(defun update-global-date ()
   (let ((timestamp (get-universal-time)))
     (update-global-date% (universal-time-to-timestamp timestamp))
     timestamp))
