@@ -1,4 +1,4 @@
-;;;; Package definitions for ATHENS.
+;;;; Package definitions for Athens.
 
 (defpackage athens.hash
   (:documentation "Hashing routines for feeds and feed items.")
@@ -29,6 +29,30 @@
            :log-imports
            :get-imports))
 
+(defpackage athens.widgets
+  (:documentation
+   "HTML widgets for Athens.")
+  (:use :cl
+        :macro-html
+        :macro-html.widgets
+        :named-readtables
+        :net.telent.date)
+  (:shadow :map :time)
+  (:export :html-widget-feed
+           :html-widget-item
+           :html-widget-log))
+
+(defpackage athens.restful-responder
+  (:documentation
+   "RESTful resource responder.")
+  (:use :cl
+	:trivial-utf-8
+	:httpd0.responses
+        :jsown
+        :athens.store
+        :athens.widgets)
+  (:export :make-athens-responder))
+
 (defpackage athens
   (:documentation "News archiver for syndication feeds.")
   (:use :cl
@@ -45,4 +69,6 @@
            :add-feed
            :remove-feed
            :update-archive
-           :archive-log))
+           :update-archive-periodically
+           :archive-log
+           :make-athens-responder))

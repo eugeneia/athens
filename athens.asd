@@ -5,9 +5,16 @@
   :author "Max Rottenkolber <max@mr.gy>"
   :license "GNU AGPL"
   :components ((:file "packages")
-               (:file "hash" :depends-on ("packages"))
-               (:file "store" :depends-on ("packages"))
-               (:file "athens" :depends-on ("packages" "hash" "store")))
+               (:file "hash"
+                      :depends-on ("packages"))
+               (:file "store"
+                      :depends-on ("packages"))
+               (:file "html-widgets"
+                      :depends-on ("packages"))
+               (:file "restful-responder"
+                      :depends-on ("packages" "store"))
+               (:file "athens"
+                      :depends-on ("packages" "hash" "store")))
   :depends-on ("trivial-feed"
                "configuration"
                "flexi-streams"
@@ -15,4 +22,8 @@
                "drakma"
                "cl-fad"
                "postmodern"
-               "simple-date"))
+               "simple-date"
+               "net-telent-date"
+               "httpd0"
+               "jsown"
+               "macro-html"))
