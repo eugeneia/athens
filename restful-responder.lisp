@@ -20,26 +20,35 @@
        ((string-equal "json" type-string) :json)
        ((string-equal "html" type-string) :html)))))
 
-(defun get-feed-response (hash)
-  "Get feed response for HASH."
+(defun get-feed-response (if-modified-since hash)
+  "Get feed response for HASH with respect to IF-MODIFIED-SINCE."
   (let ((feed (get-feed hash)))
     (if feed
-        (values :ok feed (getf feed :date))
+        (let ((timestamp (getf feed :date)))
+          (if (and if-modified-since
+                   (>= if-modified-since timestamp))
+              :not-modified
+              (values :ok feed timestamp)))
         :not-found)))
 
-(defun get-item-response (hash)
-  "Get item response for HASH."
+(defun get-item-response (if-modified-since hash)
+  "Get item response for HASH with respect to IF-MODIFIED-SINCE."
   (let ((item (get-item hash)))
     (if item
-        (values :ok item (getf item :date))
+        (let ((timestamp (getf item :date)))
+          (if (and if-modified-since
+                   (>= if-modified-since timestamp))
+              :not-modified
+              (values :ok item timestamp)))
         :not-found)))
 
-(defun response-values (resource arguments)
-  "Get response values for RESOURCE with ARGUMENTS."
+(defun response-values (resource arguments if-modified-since)
+  "Get response values for RESOURCE with ARGUMENTS with respect to
+IF-MODIFIED-SINCE."
   (handler-case
       (ecase resource
-        (:feed (apply #'get-feed-response arguments))
-        (:item (apply #'get-item-response arguments)))
+        (:feed (apply #'get-feed-response if-modified-since arguments))
+        (:item (apply #'get-item-response if-modified-since arguments)))
     ;; On failure to generate response return :NOT-FOUND.
     (error (error)
       (declare (ignore error))
@@ -68,21 +77,17 @@
 
 (defun handle-request (request if-modified-since)
   "Handle request for REQUEST and IF-MODIFIED-SINCE."
-  (if (and if-modified-since
-           (>= if-modified-since (get-global-date)))
-      :not-modified
-      (multiple-value-bind (resource arguments type)
-          (parse-request request)
-        ;; If request is invalid RESOURCE or TYPE will be NIL.
-        (if (and resource type)
-            ;; REQUEST is valid. Get RESPONSE-VALUES and
-            ;; RESPONSE-FORMATTER.
-            (multiple-value-bind (status datum write-date)
-                (response-values resource arguments)
-              (values status datum write-date 
-                      type (response-formatter resource type)))
-            ;; REQUEST is invalid. Return :NOT-FOUND.
-            :not-found))))
+  (multiple-value-bind (resource arguments type)
+      (parse-request request)
+    ;; If request is invalid RESOURCE or TYPE will be NIL.
+    (if (and resource type)
+        ;; REQUEST is valid. Get RESPONSE-VALUES and RESPONSE-FORMATTER.
+        (multiple-value-bind (status datum write-date)
+            (response-values resource arguments if-modified-since)
+          (values status datum write-date 
+                  type (response-formatter resource type)))
+        ;; REQUEST is invalid. Return :NOT-FOUND.
+        :not-found)))
 
 (defun serve (datum write-date type formatter)
   "Serve DATUM of TYPE using FORMATTER."
