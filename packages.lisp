@@ -27,7 +27,10 @@
            :get-item
            :create-log-table
            :log-imports
-           :get-imports))
+           :get-imports
+           :create-global-date-table
+           :get-global-date
+           :update-global-date))
 
 (defpackage athens.widgets
   (:documentation

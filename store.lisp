@@ -104,3 +104,27 @@
               (get-imports-2 (universal-time-to-timestamp start)
                              (universal-time-to-timestamp end))
               (get-imports-1 (universal-time-to-timestamp start)))))
+
+(defun create-global-date-table ()
+  (execute (sql (:create-table global-date
+                  ((key :type string :primary-key t)
+                   (timestamp :type timestamp)))))
+  (execute (sql-compile
+            `(:insert-into global-date
+              :set key "global-date"
+                   timestamp ,(universal-time-to-timestamp
+                               (get-universal-time)))))
+  (values))
+
+(defun get-global-date ()
+  (timestamp-to-universal-time
+   (query (sql (:select 'timestamp :from 'global-date)) :single)))
+
+(defprepared update-global-date%
+    (:update 'global-date :set 'timestamp '$1
+             :where (:= 'key "global-date")))
+
+(defun update-global-date (date)
+  (let ((timestamp (get-universal-time)))
+    (update-global-date% (universal-time-to-timestamp timestamp))
+    timestamp))

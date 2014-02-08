@@ -24,6 +24,7 @@ datatabase)."
   (create-feed-table)
   (create-item-table)
   (create-log-table)
+  (create-global-date-table)
   (values))
 
 (defun add-feed (url)
@@ -119,7 +120,8 @@ modified since DATE, in that case return NIL."
             when import-log
             collect import-log)))
     (when imports
-      (log-imports imports))))
+      (log-imports imports)
+      (update-global-date))))
 
 (defun archive-log (&optional (start 0) end)
   "Return combined imports log ranging from START to END dates."

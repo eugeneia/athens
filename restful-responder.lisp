@@ -68,19 +68,21 @@
 
 (defun handle-request (request if-modified-since)
   "Handle request for REQUEST and IF-MODIFIED-SINCE."
-  (declare (ignore if-modified-since)) ; To be implemented using last
-                                       ; archive update timestamp.
-  (multiple-value-bind (resource arguments type)
-      (parse-request request)
-    ;; If request is invalid RESOURCE or TYPE will be NIL.
-    (if (and resource type)
-        ;; REQUEST is valid. Get RESPONSE-VALUES and RESPONSE-FORMATTER.
-        (multiple-value-bind (status datum write-date)
-            (response-values resource arguments)
-          (values status datum write-date 
-                  type (response-formatter resource type)))
-        ;; REQUEST is invalid. Return :NOT-FOUND.
-        :not-found)))
+  (if (and if-modified-since
+           (>= if-modified-since (get-global-date)))
+      :not-modified
+      (multiple-value-bind (resource arguments type)
+          (parse-request request)
+        ;; If request is invalid RESOURCE or TYPE will be NIL.
+        (if (and resource type)
+            ;; REQUEST is valid. Get RESPONSE-VALUES and
+            ;; RESPONSE-FORMATTER.
+            (multiple-value-bind (status datum write-date)
+                (response-values resource arguments)
+              (values status datum write-date 
+                      type (response-formatter resource type)))
+            ;; REQUEST is invalid. Return :NOT-FOUND.
+            :not-found))))
 
 (defun serve (datum write-date type formatter)
   "Serve DATUM of TYPE using FORMATTER."
@@ -103,4 +105,5 @@
             (handle-request request if-modified-since))
         (case status
           (:ok (serve datum write-date type formatter))
+          (:not-modified (respond-not-modified))
           (otherwise (respond-not-found)))))))
