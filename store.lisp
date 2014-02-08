@@ -87,7 +87,7 @@
   (let ((timestamp (get-universal-time)))
     (log-imports% (universal-time-to-timestamp timestamp)
                   (prin1-to-string imports))
-    (sleep 1)
+    (sleep 1) ; Make sure timestamp is unique.
     timestamp))
 
 (defprepared get-imports-1
