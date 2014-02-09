@@ -1,11 +1,18 @@
-;;;; ATHENS example configuration.
+;;;; Athens example configuration.
 
 :database (:host "localhost"
            :port 5432 ; Optional, defaults to 5432.
            :user "postgres"
            :password "password"
            :name "athens" ; Optional, defaults to "athens".
-           :use-ssl :yes ; Optional, defaults to :NO.
-           )
+           :use-ssl :yes) ; Optional, defaults to :NO.
+
+:update-interval 3600 ; Optional, defaults to one hour (in seconds).
+
+:httpd0 (:host usocket:*wildcard-host* ; Optional, defaults to
+                                       ; usocket:*wildcard-host*.
+         :port 8080 ; Optional, defaults to 8080.
+         :n-threads 16 ; Optional, defaults to 16.
+         :socket-backlog 32) ; Optional, defaults to 32.
 
 :debug nil ; Optional, defaults to NIL.

@@ -2,16 +2,18 @@
 
 (in-package :athens)
 
+(defvar *configuration* nil
+  "Current configuration.")
+
 (defvar *debug* nil
   "Debug mode.")
 
 (defmacro with-configuration (configuration &body body)
   "Evaluate BODY using CONFIGURATION."
-  (let ((o!conf (gensym "conf")))
-    `(let* ((,o!conf ,configuration)
-            (*debug* (getf ,o!conf :debug)))
-       (with-database (getf ,o!conf :database)
-         ,@body))))
+  `(let* ((*configuration* ,configuration)
+          (*debug* (getf *configuration* :debug)))
+     (with-database (getf *configuration* :database)
+       ,@body)))
 
 (defmacro with-configuration-file (path &body body)
   "Evaluate BODY using configuration from PATH."
@@ -123,6 +125,18 @@ modified since DATE, in that case return NIL."
       (log-imports imports)
       (update-global-date))))
 
+(defun update-archive-periodically
+    (&optional (update-interval (or (getf *configuration*
+                                          :update-interval)
+                                    3600))) ; One hour.
+  "Update archive periodically as defined UPDATE-INTERVAL which defaults
+to :UPDATE-INTERVAL in *CONFIGURATION* or 3600 seconds."
+  (loop do
+       (unwind-protect nil
+         ;; Protect from being interrupted during update.
+         (update-archive))
+       (sleep update-interval)))
+
 (defun archive-log (&optional (start 0) end)
   "Return combined imports log ranging from START to END dates."
   (let ((table (make-hash-table :test #'equal))
@@ -135,3 +149,8 @@ modified since DATE, in that case return NIL."
                   (setf (gethash feed table) items))))
     (loop for feed being the hash-keys of table
          collect (list feed (gethash feed table)))))
+
+(defun make-server ()
+  "Return HTTPD0 server with ATHENS.RESOURCE-RESPONDER."
+  (apply #'make-httpd (make-athens-responder *configuration*)
+         (getf *configuration* :httpd0)))

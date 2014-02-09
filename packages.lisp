@@ -63,11 +63,13 @@
   (:use :cl
         :athens.hash
         :athens.store
+        :athens.restful-responder
         :configuration
         :trivial-feed
         :drakma
         :net.telent.date
-        :flexi-streams)
+        :flexi-streams
+        :httpd0)
   (:export :with-configuration
            :with-configuration-file
            :initialize-database
@@ -76,4 +78,4 @@
            :update-archive
            :update-archive-periodically
            :archive-log
-           :make-athens-responder))
+           :make-server))
