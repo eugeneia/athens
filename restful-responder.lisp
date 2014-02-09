@@ -50,8 +50,7 @@
       (sort (get-items (loop for import in imports append
                             (loop for feed in import append
                                  (second feed))))
-            (lambda (x y)
-              (< (getf x :date) (getf y :date)))))))
+            (lambda (x y) (> (getf x :date) (getf y :date)))))))
 
 (defun get-news-response (if-modified-since &optional start end)
   "Get news responce for START and END with respect to
