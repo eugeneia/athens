@@ -84,7 +84,7 @@ modified since DATE."
   "Record ITEMS for FEED unless they are already recorded and return
 list of logged item hashes."
   (loop for item in items
-     for item-hash = (feed-item-hash item)
+     for item-hash = (url-hash (getf item :link))
      for recorded-p = (unless (item-recorded-p item-hash)
                         (with-skip-errors item-hash
                           (record-item item-hash (list* :feed feed item))

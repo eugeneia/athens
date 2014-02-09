@@ -6,8 +6,7 @@
         :cl
         :flexi-streams)
   (:shadow :null) ; Shadow IRONCLAD's NULL with CL's.
-  (:export :url-hash
-           :feed-item-hash))
+  (:export :url-hash))
 
 (defpackage athens.store
   (:documentation "Persistent logging and records.")
