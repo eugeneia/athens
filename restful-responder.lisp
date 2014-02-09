@@ -4,17 +4,18 @@
 
 (defun parse-request (request)
   "Parse REQUEST and return resource arguments and type."
-  (let ((directory (remove-if-not #'stringp
-                                  (pathname-directory request)))
-        (name (pathname-name request))
+  (let ((path (remove-if-not #'stringp
+                             `(,@(pathname-directory request)
+                                 ,(pathname-name request))))
         (type-string (pathname-type request)))
     (values
-     ;; Resource may be one of "feed" or "item".
-     (let ((resource-string (first directory)))
+     ;; Resource may be one of "feed", "item" or "news".
+     (let ((resource-string (first path)))
        (cond ((string-equal "feed" resource-string) :feed)
-             ((string-equal "item" resource-string) :item)))
-     ;; Arguments are the list of strings between resource and type.
-     `(,@(rest directory) ,name)
+             ((string-equal "item" resource-string) :item)
+             ((string-equal "news" resource-string) :news)))
+     ;; Arguments are the rest of PATH.
+     (rest path)
      ;; Type may be one of "json" or "html".
      (cond
        ((string-equal "json" type-string) :json)
@@ -42,13 +43,41 @@
               (values :ok item timestamp)))
         :not-found)))
 
+(defun get-news (start end)
+  "Get NEWS for timespan defined by START and END."
+  (let ((imports (get-imports start end)))
+    (when imports
+      (sort (get-items (loop for import in imports append
+                            (loop for feed in import append
+                                 (second feed))))
+            (lambda (x y)
+              (< (getf x :date) (getf y :date)))))))
+
+(defun get-news-response (if-modified-since &optional start end)
+  "Get news responce for START and END with respect to
+IF-MODIFIED-SINCE."
+  (let* (;; END defaults to now.
+         (end (or end (get-universal-time)))
+         ;; START defaults 24 hours in the past.
+         (start (or start (- end 86400))))
+    ;; Handle IF-MODIFIED-SINCE.
+    (if (and if-modified-since
+             (or (>= if-modified-since end)
+                 (>= if-modified-since (get-global-date))))
+        :not-modified
+        (values :ok (list start end (get-news start end)) end))))
+
+(with-database (getf cl-user::*athens-conf* :database)
+  (get-news-response 0))
+
 (defun response-values (resource arguments if-modified-since)
   "Get response values for RESOURCE with ARGUMENTS with respect to
 IF-MODIFIED-SINCE."
   (handler-case
       (ecase resource
         (:feed (apply #'get-feed-response if-modified-since arguments))
-        (:item (apply #'get-item-response if-modified-since arguments)))
+        (:item (apply #'get-item-response if-modified-since arguments))
+        (:news (apply #'get-news-response if-modified-since arguments)))
     ;; On failure to generate response return :NOT-FOUND.
     (error (error)
       (declare (ignore error))
@@ -58,22 +87,37 @@ IF-MODIFIED-SINCE."
   "TO-JSON implementation for symbols."
   (to-json (string-downcase (symbol-name object))))
 
-(defun print-plist-json (plist)
+(defun plist-jsown (plist)
+  "Format PLIST for JSOWN."
+  `(:obj ,@(loop for head = plist then (cddr head)
+                 for key = (car head)
+                 for value = (cadr head)
+              while head
+              collect (cons key value))))
+
+(defun format-plist-json (plist)
   "Format PLIST as JSON to *STANDARD-OUTPUT*."
-  (write-string
-   (to-json `(:obj ,@(loop for head = plist then (cddr head)
-                           for key = (car head)
-                           for value = (cadr head)
-                        while head
-                        collect (cons key value))))))
+  (write-string (to-json (plist-jsown plist))))
+
+(defun format-news-json (news)
+  "Format NEWS as JSON to *STANDARD-OUTPUT*."
+  (destructuring-bind (start end items) news
+    (write-string
+     (to-json `(:obj ("start" . ,start)
+                     ("end" . ,end)
+                     ("items" . ,(loop for plist in items
+                                    collect (plist-jsown plist))))))))
 
 (defun response-formatter (resource type)
   "Get response formatter for RESOURCE and TYPE."
   (ecase type
-    (:json #'print-plist-json)
+    (:json (ecase resource
+             ((:feed :item) #'format-plist-json)
+             (:news #'format-news-json)))
     (:html (ecase resource
              (:feed #'html-widget-feed)
-             (:item #'html-widget-item)))))
+             (:item #'html-widget-item)
+             (:news #'html-widget-news)))))
 
 (defun handle-request (request if-modified-since)
   "Handle request for REQUEST and IF-MODIFIED-SINCE."

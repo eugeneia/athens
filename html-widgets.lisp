@@ -8,6 +8,10 @@
   "Make path to feed by HASH."
   (format nil "/feed/~a.html" hash))
 
+(defun item-path (hash)
+  "Make path to item by HASH."
+  (format nil "/item/~a.html" hash))
+
 (defun html-widget-footer ()
   "HTML widget for Athens footer."
   (hr)
@@ -71,3 +75,24 @@
          (article (progn (write-string description)
                          (values))))
        (html-widget-footer)))))
+
+(defun html-widget-news (news)
+  "HTML widget for NEWS."
+  (destructuring-bind (start end items) news
+    (let ((title (format nil "News between ~a and ~a"
+                         (universal-time-to-http-date start)
+                         (universal-time-to-http-date end))))
+      (html-widget-document
+       title
+       (lambda ()
+         (header (b title))
+         (if items
+             (loop for item in items
+                do (p (date-string (getf item :date))
+                      " "
+                      (time-string (getf item :date) nil 0 nil)
+                      "—"
+                      (a [:href (item-path (getf item :hash))]
+                         (getf item :title))))
+             (p "No news during that time."))
+         (html-widget-footer))))))

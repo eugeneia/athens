@@ -75,6 +75,17 @@
     (when result
       (values (read-from-string (caar result))))))
 
+(defun prepare-get-items (hashes)
+  (sql-compile
+   `(:select hash datum :from item
+             :where (:or ,@(loop for hash in hashes
+                              collect `(:= 'hash ,hash))))))
+
+(defun get-items (hashes)
+  (let ((results (query (prepare-get-items hashes))))
+    (loop for (hash datum) in results
+       collect (list* :hash hash (read-from-string datum)))))
+
 (defun create-log-table ()
   (execute (sql (:create-table log
                   ((timestamp :type timestamp :primary-key t)

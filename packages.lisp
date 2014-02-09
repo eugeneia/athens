@@ -25,6 +25,7 @@
            :item-recorded-p
            :record-item
            :get-item
+           :get-items
            :create-log-table
            :log-imports
            :get-imports
@@ -39,11 +40,12 @@
         :macro-html
         :macro-html.widgets
         :named-readtables
-        :net.telent.date)
+        :net.telent.date
+        :pretty-string)
   (:shadow :map :time)
   (:export :html-widget-feed
            :html-widget-item
-           :html-widget-log))
+           :html-widget-news))
 
 (defpackage athens.restful-responder
   (:documentation

@@ -26,4 +26,5 @@
                "net-telent-date"
                "httpd0"
                "jsown"
-               "macro-html"))
+               "macro-html"
+               "pretty-string"))
