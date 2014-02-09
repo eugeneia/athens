@@ -56,18 +56,17 @@
   "Get news responce for START and END with respect to
 IF-MODIFIED-SINCE."
   (let* (;; END defaults to now.
-         (end (or end (get-universal-time)))
+         (end (or (and end (parse-integer end))
+                  (get-universal-time)))
          ;; START defaults 24 hours in the past.
-         (start (or start (- end 86400))))
+         (start (or (and start (parse-integer start))
+                    (- end 86400))))
     ;; Handle IF-MODIFIED-SINCE.
     (if (and if-modified-since
              (or (>= if-modified-since end)
                  (>= if-modified-since (get-global-date))))
         :not-modified
         (values :ok (list start end (get-news start end)) end))))
-
-(with-database (getf cl-user::*athens-conf* :database)
-  (get-news-response 0))
 
 (defun response-values (resource arguments if-modified-since)
   "Get response values for RESOURCE with ARGUMENTS with respect to
