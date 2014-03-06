@@ -57,7 +57,9 @@ includes «Accept-Charset» to favor UTF-8."
 modified since DATE."
   (multiple-value-bind (body status)
       (with-flexi-use-value
-        (http-request url :additional-headers (headers date)))
+        (http-request url
+                      :additional-headers (headers date)
+                      :connection-timeout 10))
     (case status
       (200 body)
       (304 nil)
