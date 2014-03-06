@@ -1,0 +1,59 @@
+;;;; JavaScript browser for an Athens instance.
+
+(in-package :athens.magnifier)
+
+(defmacro send (method object &rest arguments)
+  `(,(if (and (listp object)
+              (eq '@ (first object)))
+         (append object (list method))
+         `(@ ,object ,method))
+     ,@arguments))
+
+(defun make-text-node (string)
+  "Make text node for STRING."
+  (send create-text-node document string))
+
+(defun make-node (type &rest children)
+  "Make DOM node of TYPE with CHILDREN."
+  (let ((node (send create-element document type)))
+    (loop for child in children do
+         (send append-child
+               node
+               (if (stringp child)
+                   (make-text-node child)
+                   child)))
+    node))
+
+(defun make-widget (element &optional update-fn)
+  "Make widget for ELEMENT with UPDATE-FN."
+  (create :element element
+          :update-fn update-fn))
+
+(defun widget-element (widget)
+  "Get element of WIDGET."
+  (@ widget :element))
+
+(defun append-widget (element widget)
+  "Append WIDGET element to ELEMENT."
+  (send append-child element (widget-element widget)))
+
+(defun update-widget (widget &rest arguments)
+  "Update WIDGET with ARGUMENTS."
+  (apply (@ widget :update-fn) arguments))
+
+(defun make-button (label action-fn &optional (type "button"))
+  "Make button widget with element of TYPE with LABEL that calls
+ACTION-FN when pressed."
+  (let ((button (make-node type label)))
+    (send add-event-listener button "click" action-fn f)
+    (make-widget button)))
+
+
+;; Kickstart.
+(send add-event-listener
+      window
+      "load"
+      (lambda ()
+        (append-widget
+         (@ document body)
+         (make-button "Test" (lambda () (alert "foo"))))))
