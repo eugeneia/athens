@@ -70,8 +70,9 @@ modified since DATE."
   "Try to decode DATA to a string if necessary."
   (etypecase data
     (string data)
-    ((array (unsigned-byte 8)) (with-flexi-use-value
-                                 (octets-to-string data)))))
+    ((array (unsigned-byte 8))
+     (with-flexi-use-value
+       (octets-to-string data :external-format :utf-8)))))
 
 (defmacro with-skip-errors (identifier &body body)
   "Skip and log errors for IDENTIFIER during BODY."
