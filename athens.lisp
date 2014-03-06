@@ -135,6 +135,9 @@ modified since DATE, in that case return NIL."
   "Update archive periodically as defined UPDATE-INTERVAL which defaults
 to :UPDATE-INTERVAL in *CONFIGURATION* or 3600 seconds."
   (loop do
+       (let ((timestamp (get-universal-time)))
+         (format *error-output* "~a ~a:~%"
+                 (date-string timestamp) (time-string timestamp)))
        (unwind-protect nil
          ;; Protect from being interrupted during update.
          (update-archive))

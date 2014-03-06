@@ -68,7 +68,8 @@
         :drakma
         :net.telent.date
         :flexi-streams
-        :httpd0)
+        :httpd0
+        :pretty-string)
   (:export :with-configuration
            :with-configuration-file
            :initialize-database
