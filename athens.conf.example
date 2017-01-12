@@ -15,4 +15,8 @@
          :n-threads 16 ; Optional, defaults to 16.
          :socket-backlog 32) ; Optional, defaults to 32.
 
+;; Optional, no default.
+:frontend (:scripts ("magnifier.js")
+           :stylesheets ((:media "screen" :href "magnifier.css")))
+
 :debug nil ; Optional, defaults to NIL.

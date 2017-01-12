@@ -17,7 +17,9 @@
                       :depends-on ("packages" "hash" "store")))
   :depends-on ("trivial-feed"
                "configuration"
+               "q-thread-pool"
                "flexi-streams"
+               "file-types"
                "ironclad"
                "drakma"
                "cl-fad"
@@ -27,4 +29,5 @@
                "httpd0"
                "jsown"
                "macro-html"
-               "pretty-string"))
+               "pretty-string"
+               "parenscript"))

@@ -4,6 +4,13 @@
 
 (in-readtable macro-html:syntax)
 
+(defun html-widget-frontend (&key scripts stylesheets)
+  "HTML widget for frontend application (Magnifier)."
+  (html (html-widget-head "Athens Magnifier"
+                          :scripts scripts
+                          :stylesheets stylesheets)
+        (body)))
+
 (defun feed-path (hash)
   "Make path to feed by HASH."
   (format nil "/feed/~a.html" hash))

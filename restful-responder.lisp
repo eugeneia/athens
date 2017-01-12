@@ -2,6 +2,16 @@
 
 (in-package :athens.restful-responder)
 
+(defun serve-frontend (configuration)
+  "Server frontend with CONFIGURATION."
+  (let ((body (string-to-utf-8-bytes
+               (with-output-to-string (*standard-output*)
+                 (apply #'html-widget-frontend configuration)))))
+    (respond-ok ((length body)
+                 '("text" "html; charset=UTF-8")
+                 (get-universal-time))
+      (write-sequence body *standard-output*))))
+
 (defun parse-request (request)
   "Parse REQUEST and return resource arguments and type."
   (let ((path (remove-if-not #'stringp
@@ -83,7 +93,7 @@ IF-MODIFIED-SINCE."
 
 (defmethod to-json ((object symbol))
   "TO-JSON implementation for symbols."
-  (to-json (string-downcase (symbol-name object))))
+  (to-json (symbol-name object)))
 
 (defun plist-jsown (plist)
   "Format PLIST for JSOWN."
@@ -101,10 +111,10 @@ IF-MODIFIED-SINCE."
   "Format NEWS as JSON to *STANDARD-OUTPUT*."
   (destructuring-bind (start end items) news
     (write-string
-     (to-json `(:obj ("start" . ,start)
-                     ("end" . ,end)
-                     ("items" . ,(loop for plist in items
-                                    collect (plist-jsown plist))))))))
+     (to-json `(:obj (:start . ,start)
+                     (:end . ,end)
+                     (:items . ,(loop for plist in items
+                                   collect (plist-jsown plist))))))))
 
 (defun response-formatter (resource type)
   "Get response formatter for RESOURCE and TYPE."
@@ -145,12 +155,17 @@ IF-MODIFIED-SINCE."
 
 (defun make-athens-responder (configuration)
   "Return RESTful responder for Athens using CONFIGURATION."
-  (let ((db-configuration (getf configuration :database)))
+  (let ((db-configuration (getf configuration :database))
+        (frontend-configuration (getf configuration :frontend)))
     (lambda (request if-modified-since)
-      (multiple-value-bind (status datum write-date type formatter)
-          (with-database db-configuration
-            (handle-request request if-modified-since))
-        (case status
-          (:ok (serve datum write-date type formatter))
-          (:not-modified (respond-not-modified))
-          (otherwise (respond-not-found)))))))
+      (if (equal #p"" request)
+          ;; Serve frontend.
+          (serve-frontend frontend-configuration)
+          ;; Serve API.
+          (multiple-value-bind (status datum write-date type formatter)
+              (with-database db-configuration
+                (handle-request request if-modified-since))
+            (case status
+              (:ok (serve datum write-date type formatter))
+              (:not-modified (respond-not-modified))
+              (otherwise (respond-not-found))))))))

@@ -42,7 +42,8 @@
         :net.telent.date
         :pretty-string)
   (:shadow :map :time)
-  (:export :html-widget-feed
+  (:export :html-widget-frontend
+           :html-widget-feed
            :html-widget-item
            :html-widget-news))
 
@@ -78,3 +79,7 @@
            :update-archive-periodically
            :archive-log
            :make-server))
+
+(defpackage athens.magnifier
+  (:use :cl :parenscript)
+  (:shadow :string))

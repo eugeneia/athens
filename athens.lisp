@@ -76,7 +76,7 @@ modified since DATE."
   `(if (not *debug*)
        (handler-case (progn ,@body)
          (error (condition)
-           (format *error-output* "~&Skipping ~a because: ~S ~a~%"
+           (format *error-output* "~&Skipping ~a: ~S ~a~%"
                    ,identifier condition condition)))
        (progn ,@body)))
 
@@ -132,9 +132,11 @@ modified since DATE, in that case return NIL."
   "Update archive periodically as defined UPDATE-INTERVAL which defaults
 to :UPDATE-INTERVAL in *CONFIGURATION* or 3600 seconds."
   (loop do
-       (unwind-protect nil
-         ;; Protect from being interrupted during update.
-         (update-archive))
+       (handler-case
+           (unwind-protect nil
+             ;; Protect from being interrupted during update.
+             (update-archive))
+         (t (x) (format *error-output* "~S ~A~%" x x)))
        (sleep update-interval)))
 
 (defun archive-log (&optional (start 0) end)
