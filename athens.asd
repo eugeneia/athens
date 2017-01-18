@@ -13,16 +13,17 @@
                       :depends-on ("packages"))
                (:file "restful-responder"
                       :depends-on ("packages" "store"))
-               (:file "athens"
-                      :depends-on ("packages" "hash" "store")))
+               (:file "importer"
+                      :depends-on ("packages"))
+               (:file "fetcher"
+                      :depends-on ("packages"))
+               (:file "service"
+                      :depends-on ("packages" "importer" "fetcher")))
   :depends-on ("trivial-feed"
                "configuration"
-               "q-thread-pool"
                "flexi-streams"
-               "file-types"
                "ironclad"
                "drakma"
-               "cl-fad"
                "postmodern"
                "simple-date"
                "net-telent-date"

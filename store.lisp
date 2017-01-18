@@ -3,14 +3,21 @@
 (in-package :athens.store)
 
 (defun db-spec
-    (&key host (port 5432) user password (name "athens") (use-ssl :yes))
-  "Return connection to database specified by parameters."
+    (&key host (port 5432) user password (name "athens") (use-ssl :yes)
+     &allow-other-keys)
   `(,name ,user ,password ,host
-    :port ,port :use-ssl ,use-ssl :pooled-p t))
+    :port ,port :use-ssl ,use-ssl))
 
-(defmacro with-database (db-configuration &body body)
-  `(with-connection (apply #'db-spec ,db-configuration)
-          ,@body))
+(defmacro with-database (db-configuration &body body
+                         &aux (conf-sym (gensym "conf")))
+  `(let ((,conf-sym ,db-configuration))
+     (with-connection (apply #'db-spec ,conf-sym)
+       (setf (stream-input-timeout
+              #1=(cl-postgres::connection-socket *database*))
+             #2=(getf ,conf-sym :timeout 10))
+       (setf (stream-output-timeout #1#)
+             #2#)
+       ,@body)))
 
 (defun create-feed-table ()
   (execute (sql (:create-table feed
@@ -18,124 +25,59 @@
                    (datum :type string))))))
 
 (defun feed-index ()
-  (mapcar #'car (query (sql (:select 'hash :from 'feed)))))
-
-(defprepared insert-feed%
-    (:insert-into 'feed :set 'hash '$1 'datum '$2))
+  (query (sql (:select 'hash :from 'feed))
+         :column))
 
 (defun insert-feed (hash feed)
-  (insert-feed% hash (prin1-to-string feed))
-  (values))
-
-(defprepared update-feed%
-    (:update 'feed :set 'datum '$2 :where (:= 'hash '$1)))
+  (query (sql (:insert-into 'feed :set 'hash '$1 'datum '$2))
+         :none hash (prin1-to-string feed)))
 
 (defun update-feed (hash feed)
-  (update-feed% hash (prin1-to-string feed))
-  (values))
-
-(defprepared get-feed%
-    (:select 'datum :from 'feed :where (:= 'hash '$1)))
+  (query (sql (:update 'feed :set 'datum '$2 :where (:= 'hash '$1)))
+         :none hash (prin1-to-string feed)))
 
 (defun get-feed (hash)
-  (let ((result (get-feed% hash)))
-    (when result
-      (values (read-from-string (caar result))))))
-
-(defprepared delete-feed%
-    (:delete-from 'feed :where (:= 'hash '$1)))
+  (read-from-string
+   (query (sql (:select 'datum :from 'feed :where (:= 'hash '$1)))
+          :single! hash)))
 
 (defun delete-feed (hash)
-  (delete-feed% hash)
-  (values))
+  (query (sql (:delete-from 'feed :where (:= 'hash '$1)))
+         :none hash))
 
 (defun create-item-table ()
   (execute (sql (:create-table item
                   ((hash :type string :primary-key t)
-                   (datum :type string))))))
-
-(defprepared item-recorded-p%
-    (:select 'hash :from 'item :where (:= 'hash '$1)))
+                   (datum :type string)
+                   (date :type timestamp))))))
 
 (defun item-recorded-p (hash)
-  (not (null (item-recorded-p% hash))))
+  (not (null (query (sql (:select 'hash :from 'item :where (:= 'hash '$1)))
+                    :single hash))))
 
-(defprepared record-item%
-    (:insert-into 'item :set 'hash '$1 'datum '$2))
-
-(defun record-item (hash item)
-  (record-item% hash (prin1-to-string item))
-  (values))
-
-(defprepared get-item%
-    (:select 'datum :from 'item :where (:= 'hash '$1)))
+(defun insert-item (hash item)
+  (query (sql (:insert-into 'item :set 'hash '$1 'datum '$2 'date '$3))
+         :none
+         hash (prin1-to-string item)
+         (universal-time-to-timestamp (getf item :date))))
 
 (defun get-item (hash)
-  (let ((result (get-item% hash)))
-    (when result
-      (values (read-from-string (caar result))))))
+  (read-from-string
+   (query (sql (:select 'datum :from 'item :where (:= 'hash '$1)))
+          :single! hash)))
 
-(defun prepare-get-items (hashes)
-  (sql-compile
-   `(:select hash datum :from item
-             :where (:or ,@(loop for hash in hashes
-                              collect `(:= 'hash ,hash))))))
+(defprepared get-items-1
+    (:select 'hash 'datum :from 'item :where (:>= 'date '$1)))
 
-(defun get-items (hashes)
-  (let ((results (query (prepare-get-items hashes))))
-    (loop for (hash datum) in results
-       collect (list* :hash hash (read-from-string datum)))))
+(defprepared get-items-2
+    (:select 'hash 'datum :from 'item :where (:and (:>= 'date '$1)
+                                                   (:<= 'date '$2))))
 
-(defun create-log-table ()
-  (execute (sql (:create-table log
-                  ((timestamp :type timestamp :primary-key t)
-                   (imports :type string))))))
-
-(defprepared log-imports%
-    (:insert-into 'log :set 'timestamp '$1 'imports '$2))
-
-(defun log-imports (imports)
-  (let ((timestamp (get-universal-time)))
-    (log-imports% (universal-time-to-timestamp timestamp)
-                  (prin1-to-string imports))
-    (sleep 1) ; Make sure timestamp is unique.
-    timestamp))
-
-(defprepared get-imports-1
-    (:select 'imports :from 'log :where (:>= 'timestamp '$1)))
-
-(defprepared get-imports-2
-    (:select 'imports :from 'log :where (:and (:>= 'timestamp '$1)
-                                              (:<= 'timestamp '$2))))
-
-(defun get-imports (&optional (start 0) end)
-  (mapcar (lambda (import)
-            (read-from-string (car import)))
-          (if end
-              (get-imports-2 (universal-time-to-timestamp start)
-                             (universal-time-to-timestamp end))
-              (get-imports-1 (universal-time-to-timestamp start)))))
-
-(defun create-global-date-table ()
-  (execute (sql (:create-table global-date
-                  ((key :type string :primary-key t)
-                   (timestamp :type timestamp)))))
-  (execute (sql-compile
-            `(:insert-into global-date
-              :set key "global-date"
-                   timestamp ,(universal-time-to-timestamp
-                               (get-universal-time)))))
-  (values))
-
-(defun get-global-date ()
-  (timestamp-to-universal-time
-   (query (sql (:select 'timestamp :from 'global-date)) :single)))
-
-(defprepared update-global-date%
-    (:update 'global-date :set 'timestamp '$1
-             :where (:= 'key "global-date")))
-
-(defun update-global-date ()
-  (let ((timestamp (get-universal-time)))
-    (update-global-date% (universal-time-to-timestamp timestamp))
-    timestamp))
+(defun get-items (&optional (start 0) end)
+  (let ((items (if end
+                   (get-items-2 (universal-time-to-timestamp start)
+                                (universal-time-to-timestamp end))
+                   (get-items-1 (universal-time-to-timestamp start)))))
+    (loop for item in items do
+         (setf #1=(second item) (read-from-string #1#)))
+    items))

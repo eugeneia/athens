@@ -9,8 +9,9 @@
   (:export :url-hash))
 
 (defpackage athens.store
-  (:documentation "Persistent logging and records.")
+  (:documentation "Persistent records.")
   (:use :cl
+        :ccl
         :simple-date
         :postmodern)
   (:export :with-database
@@ -22,15 +23,9 @@
            :delete-feed
            :create-item-table
            :item-recorded-p
-           :record-item
+           :insert-item
            :get-item
-           :get-items
-           :create-log-table
-           :log-imports
-           :get-imports
-           :create-global-date-table
-           :get-global-date
-           :update-global-date))
+           :get-items))
 
 (defpackage athens.widgets
   (:documentation
@@ -79,6 +74,24 @@
            :update-archive-periodically
            :archive-log
            :make-server))
+
+(defpackage athens.service
+  (:use :cl
+        :erlangen
+        :erlangen-platform.log
+        :erlangen-platform.supervisor
+        :erlangen-platform.timer
+        :erlangen-platform.server
+        :athens.hash
+        :athens.store
+        :trivial-feed
+        :drakma
+        :flexi-streams
+        :net.telent.date)
+  (:export :athens-service
+           :initialize-database
+           :add-feed
+           :remove-feed))
 
 (defpackage athens.magnifier
   (:use :cl :parenscript)
