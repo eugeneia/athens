@@ -40,40 +40,23 @@
   (:export :html-widget-frontend
            :html-widget-feed
            :html-widget-item
-           :html-widget-news))
+           :html-widget-news
+           :css-widget-style))
 
 (defpackage athens.restful-responder
   (:documentation
    "RESTful resource responder.")
   (:use :cl
+        :ccl
+        :erlangen-platform.log
+        :erlangen-platform.socket-server
 	:trivial-utf-8
+        :httpd0
 	:httpd0.responses
-        :jsown
+        :jonathan
         :athens.store
         :athens.widgets)
-  (:export :make-athens-responder))
-
-(defpackage athens
-  (:documentation "News archiver for syndication feeds.")
-  (:use :cl
-        :athens.hash
-        :athens.store
-        :athens.restful-responder
-        :configuration
-        :trivial-feed
-        :drakma
-        :net.telent.date
-        :flexi-streams
-        :httpd0)
-  (:export :with-configuration
-           :with-configuration-file
-           :initialize-database
-           :add-feed
-           :remove-feed
-           :update-archive
-           :update-archive-periodically
-           :archive-log
-           :make-server))
+  (:export :athens-responder))
 
 (defpackage athens.service
   (:use :cl
@@ -82,8 +65,10 @@
         :erlangen-platform.supervisor
         :erlangen-platform.timer
         :erlangen-platform.server
+        :erlangen-platform.socket-server
         :athens.hash
         :athens.store
+        :athens.restful-responder
         :trivial-feed
         :drakma
         :flexi-streams

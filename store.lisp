@@ -67,11 +67,13 @@
           :single! hash)))
 
 (defprepared get-items-1
-    (:select 'hash 'datum :from 'item :where (:>= 'date '$1)))
+    (:order-by (:select 'hash 'datum :from 'item :where (:>= 'date '$1))
+               (:desc 'date)))
 
 (defprepared get-items-2
-    (:select 'hash 'datum :from 'item :where (:and (:>= 'date '$1)
-                                                   (:<= 'date '$2))))
+    (:order-by (:select 'hash 'datum :from 'item :where (:and (:>= 'date '$1)
+                                                              (:<= 'date '$2)))
+               (:desc 'date)))
 
 (defun get-items (&optional (start 0) end)
   (let ((items (if end

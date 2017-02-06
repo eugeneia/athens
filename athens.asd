@@ -27,8 +27,9 @@
                "postmodern"
                "simple-date"
                "net-telent-date"
+               "erlangen-platform"
                "httpd0"
-               "jsown"
+               "jonathan"
                "macro-html"
                "pretty-string"
                "parenscript"))

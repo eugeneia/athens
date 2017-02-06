@@ -4,11 +4,14 @@
 
 (in-readtable macro-html:syntax)
 
-(defun html-widget-frontend (&key scripts stylesheets)
+(defparameter *scripts* '("/script"))
+(defparameter *stylesheets* '((:href "/style" :media "screen")))
+
+(defun html-widget-frontend ()
   "HTML widget for frontend application (Magnifier)."
   (html (html-widget-head "Athens Magnifier"
-                          :scripts scripts
-                          :stylesheets stylesheets)
+                          :scripts *scripts*
+                          :stylesheets *stylesheets*)
         (body)))
 
 (defun feed-path (hash)
@@ -51,7 +54,8 @@
          (when link
            (dt "Link")
            (dd (a [:href link] (truncate-string link))))))
-       (html-widget-footer)))))
+       (html-widget-footer))
+     :stylesheets *stylesheets*)))
 
 (defun html-widget-item (item)
   "HTML widget for ITEM."
@@ -77,15 +81,16 @@
          (dd (a [:href (feed-path feed)] (truncate-string feed)))
          (when language
            (dt "Language")
-           (dd (symbol-name language)))))
+           (dd language))))
        (when description
          (article (progn (write-string description)
                          (values))))
-       (html-widget-footer)))))
+       (html-widget-footer))
+     :stylesheets *stylesheets*)))
 
 (defun html-widget-news (news)
   "HTML widget for NEWS."
-  (destructuring-bind (start end items) news
+  (destructuring-bind (&key start end items) news
     (let ((title (format nil "News between ~a and ~a"
                          (universal-time-to-http-date start)
                          (universal-time-to-http-date end))))
@@ -94,12 +99,43 @@
        (lambda ()
          (header (b title))
          (if items
-             (loop for item in items
+             (loop for (hash item) in items
                 do (p (date-string (getf item :date))
                       " "
                       (time-string (getf item :date) nil 0 nil)
                       "—"
-                      (a [:href (item-path (getf item :hash))]
+                      (a [:href (item-path hash)]
                          (getf item :title))))
              (p "No news during that time."))
-         (html-widget-footer))))))
+         (html-widget-footer))
+       :stylesheets *stylesheets*))))
+
+(defun css-widget-style ()
+  (write-string
+   "body {
+    font-family: sans-serif;
+    padding: 1em;
+}
+
+svg {
+    overflow: hidden;
+    display: block;
+    width: 100%;
+    height: 60%;
+}
+
+.node rect {
+    stroke: #333;
+    stroke-width: 1.5px;
+    fill: #fff;
+}
+
+.edgeLabel rect {
+    fill: #fff;
+}
+
+.edgePath {
+    stroke: #333;
+    stroke-width: 1.5px;
+    fill: none;
+}"))
