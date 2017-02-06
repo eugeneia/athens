@@ -21,7 +21,7 @@
                                  :link link
                                  :date date
                                  :title title
-                                 :description description)))
+                                 :description (clean description +basic+))))
   (values nil 'no-value))
 
 (defun feed-importer (db-connection)

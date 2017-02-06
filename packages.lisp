@@ -72,7 +72,8 @@
         :trivial-feed
         :drakma
         :flexi-streams
-        :net.telent.date)
+        :net.telent.date
+        :sanitize)
   (:export :athens-service
            :initialize-database
            :add-feed

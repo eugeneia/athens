@@ -32,4 +32,5 @@
                "jonathan"
                "macro-html"
                "pretty-string"
-               "parenscript"))
+               "parenscript"
+               "sanitize"))
