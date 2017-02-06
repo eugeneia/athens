@@ -25,7 +25,5 @@
   (values nil 'no-value))
 
 (defun feed-importer (db-connection)
-  (register :importer)
-  (unwind-protect (with-database db-connection
-                    (server 'import-feed))
-    (unregister :importer)))
+  (with-database db-connection
+    (server 'import-feed)))

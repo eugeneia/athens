@@ -68,13 +68,9 @@ includes «Accept-Charset» to favor UTF-8."
 (defun feed-fetcher (db-configuration &key (pull-interval 3600)
                                            (concurrent-requests 10)
                                            (get-timeout 5))
-  (register :fetcher)
-  (unwind-protect
-       (loop for start = (get-universal-time) then (+ start pull-interval) do
-            (send `(:pull ,(agent) :start ,start) :timer)
-            (ecase (receive :timeout (* pull-interval 2))
-              (:pull (write-log :pull)
-                     (pull-feeds db-configuration
-                                 concurrent-requests
-                                 get-timeout))))
-    (unregister :fetcher)))
+  (send `(:pull ,(agent) :repeat ,pull-interval) :fetch-timer)
+  (loop do (ecase (receive :timeout (* pull-interval 2))
+             (:pull (write-log :pull)
+                    (pull-feeds db-configuration
+                                concurrent-requests
+                                get-timeout)))))
