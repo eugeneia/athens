@@ -5,6 +5,7 @@
 (in-readtable macro-html:syntax)
 
 (defparameter *scripts* '("/script"))
+
 (defparameter *stylesheets* '((:href "/style" :media "screen")))
 
 (defun html-widget-frontend ()
@@ -114,28 +115,12 @@
   (write-string
    "body {
     font-family: sans-serif;
-    padding: 1em;
+    padding: 0.5em;
 }
+h1 { color: #ccc;
+     margin: 0;
+     padding: 0;
+     text-align: right;
+     font-size: small; }
 
-svg {
-    overflow: hidden;
-    display: block;
-    width: 100%;
-    height: 60%;
-}
-
-.node rect {
-    stroke: #333;
-    stroke-width: 1.5px;
-    fill: #fff;
-}
-
-.edgeLabel rect {
-    fill: #fff;
-}
-
-.edgePath {
-    stroke: #333;
-    stroke-width: 1.5px;
-    fill: none;
-}"))
+"))

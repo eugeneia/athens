@@ -33,4 +33,5 @@
                "macro-html"
                "pretty-string"
                "parenscript"
+               "asdf"
                "sanitize"))

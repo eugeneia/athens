@@ -28,9 +28,13 @@
   (query (sql (:select 'hash :from 'feed))
          :column))
 
-(defun insert-feed (hash feed)
-  (query (sql (:insert-into 'feed :set 'hash '$1 'datum '$2))
-         :none hash (prin1-to-string feed)))
+(defun insert-feed (url)
+  (let ((hash (url-hash url)))
+    (handler-case (query (sql (:insert-into 'feed :set 'hash '$1 'datum '$2))
+                         :none hash (prin1-to-string `(:source ,url :date 0)))
+      (cl-postgres-error:unique-violation (error)
+        (declare (ignore error))))
+    hash))
 
 (defun update-feed (hash feed)
   (query (sql (:update 'feed :set 'datum '$2 :where (:= 'hash '$1)))

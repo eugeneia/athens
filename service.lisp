@@ -29,7 +29,7 @@ datatabase)."
 (defun add-feed (url &key database &allow-other-keys)
   "Add feed at URL to archive."
   (with-database database
-    (insert-feed (url-hash url) `(:source ,url :date 0))))
+    (insert-feed url)))
 
 (defun remove-feed (feed-hash &key database &allow-other-keys)
   "Remove feed by FEED-HASH."

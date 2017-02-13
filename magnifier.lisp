@@ -40,19 +40,19 @@
   (loop while (send has-child-nodes node)
      do (send remove-child node (@ node last-child))))
 
-(defmacro style (node &rest rules)
+(defmacro style (node &rest rules &aux (node-sym (gensym "node")))
   (unless (evenp (length rules))
     (error "Uneven number of arguments (key/value pairs) in RULES."))
-  `(setf ,@(loop for head = rules then (cddr head)
-              while head
-              collect `(@ ,node style ,(first head))
-              collect (second head))))
+  `(let ((,node-sym ,node))
+     (setf ,@(loop for head = rules then (cddr head)
+                while head
+                collect `(@ ,node-sym style ,(first head))
+                collect (second head)))
+     ,node-sym))
 
 (defun load-html (string &optional (parent-type :div))
   "Parse DOM from STRING and return it in a container of PARENT-TYPE."
   (let ((node (make-node parent-type)))
-    (style node background "#f0f0f0"
-                padding "0.5em")
     (setf (@ node |innerHTML|) string)
     node))
 
@@ -97,6 +97,14 @@ ACTION-FN when pressed."
 (defun get-universal-time ()
   "Get universal time as a CL date."
   (cl-date (new (|Date|))))
+
+(defun parse-date (string)
+  "Parse CL date from STRING."
+  (let ((result (send parse |Date| string)))
+    (if (and (numberp result)
+             (not (|isNaN| result)))
+        (new (|Date| result))
+        (throw (+ "Could not parse: " string)))))
 
 (defun text-node-p (node)
   "Predicate to test if NODE is a text node."
@@ -193,52 +201,77 @@ on success and ERROR on failure."
                   ;; Request successful, call resultFn with parsed
                   ;; object.
                   (callback
-                   (send parse *JSON* (@ request response-Text)))
+                   (send parse *JSON* (@ request response-text)))
                   ;; Request failed, call ERROR.
                   (error)))))
     (send open request "GET" url t)
     (send send request nil)))
 
-(defun make-item (item)
-  "Item object."
-  (with-slots (*hash* *feed* *date* *link* *title* *description*)
-      item
-    (create :hash *hash*
-            :feed *feed*
-            :date *date*
-            :link *link*
-            :title *title*
-            :description (load-html *description*)
-            :keywords nil)))
+(defun post (url payload callback error)
+  "Post PAYLOAD to URL. Call CALLBACK with request on success, and ERROR on
+failure."
+  (let ((request (new (|XMLHttpRequest|))))
+    (setf (@ request :onreadystatechange)
+          (lambda ()
+            (when (= (@ request ready-state) 4)
+              (if (= (@ request status) 200)
+                  (callback request)
+                  (error)))))
+    (send open request "POST" url t)
+    (send send request payload)))
+
+(defun hsv-to-rgb (h s v)
+  (let* ((h-i (parse-int (* h 6)))
+         (f (- (* h 6) h-i))
+         (p (* v (- 1 s)))
+         (q (* v (- 1 (* f s))))
+         (tt (* v (- 1 (* (- 1 f) s)))))
+    (case h-i
+      (0 (list v tt p))
+      (1 (list q v p))
+      (2 (list p v tt))
+      (3 (list p q v))
+      (4 (list tt p v))
+      (5 (list v p q))
+      (otherwise (throw (+ "Bad hue value: " h))))))
+
+(defvar *golden-ratio* 0.618033988749895)
+
+(defun keyword-color (keyword)
+  (let ((n 0))
+    (loop for i from 0 to (1- (@ keyword length)) do
+         (incf n (* (send char-code-at keyword i) *golden-ratio*)))
+    (let ((rgb (hsv-to-rgb (% n 1) 0.2 0.98)))
+      (flet ((to-hex (n) (send to-string (parse-int (* n 256)) 16)))
+        (+ "#"
+           (to-hex (aref rgb 0))
+           (to-hex (aref rgb 1))
+           (to-hex (aref rgb 2)))))))
 
 (defun item-title-words (item)
   "Return words of ITEM title."
-  (string-words (@ item :title)))
+  (string-words (@ item "TITLE")))
 
 (defun item-description-words (item)
   "Return words of ITEM description."
-  (string-words (node-string (@ item :description))))
+  (string-words (node-string (@ item "DESCRIPTION"))))
 
-(defun make-timespan (callback)
+(defun make-timespan (callback &optional init-from init-to)
   "Timespan selector widget."
   (let* ((from (make-node :input))
          (to (make-node :input))
          (select (make-button "Select" (lambda ()
                                          (callback (@ from :value)
                                                    (@ to :value))))))
-    (send set-attribute from :type :datetime)
-    (send set-attribute to :type :datetime)
+    (send set-attribute from :type "datetime-local")
+    (send set-attribute to :type "datetime-local")
+    (when init-from
+      (setf (@ from :value) (send to-string init-from)))
+    (when init-to
+      (setf (@ to :value) (send to-string init-to)))
     (make-widget (make-node :nav
                             from to
                             (widget-element select)))))
-
-(defun parse-date (string)
-  "Parse CL date from STRING."
-  (let ((result (send parse |Date| string)))
-    (if (and (numberp result)
-             (not (|isNaN| result)))
-        (cl-date (new (|Date| result)))
-        (throw (+ "Could not parse: " string)))))
 
 (defun build-context (db items size)
   ;; Scan words.
@@ -259,7 +292,10 @@ on success and ERROR on failure."
 
 (defun make-progress ()
   "Widget that displays progress messages."
-  (let ((status (make-node :div)))
+  (let ((status (style (make-node :div)
+                       :position "absolute"
+                       :top "0.5em" :left "0.5em"
+                       :color "#ccc")))
     (flet ((on (message)
              (send append-child status
                    (make-text-node (+ message " "))))
@@ -277,15 +313,16 @@ on success and ERROR on failure."
   "Load context for timespan defined by FROM and TO and pass it to
 CALLBACK."
   (update-widget *progress* :status "Fetching data...")
-  (request (+ "http://athens.mr.gy/news/" from "/" to ".json")
+  (request (+ "/news.json?start=" from "&end=" to)
            ;; On success.
            (lambda (response)
              (update-widget *progress* :status "Building context...")
              (let ((items (create)))
                ;; Sort items in RESPONSE into items table.
-               (loop for item in (@ response *items*)
-                  do (setf (aref items (@ item *hash*))
-                           (make-item item)))
+               (loop for (hash item) in (@ response "ITEMS") do
+                    (setf #1=(@ item "DESCRIPTION") (load-html #1#)
+                          (@ item :hash) hash
+                          (aref items hash) item))
                (let ((size (@ (hash-keys items) :length))
                      (db (create)))
                  ;; Fill DB.
@@ -310,112 +347,87 @@ CALLBACK."
              append (@ (aref items hash) :keywords)))
      32)))
 
-(defun edge-name (edge)
-  (let ((e (send sort edge)))
-    (+ (aref e 0) "=>" (aref e 1))))
-
-(defun keyword-edges (context keywords)
+(defun context-keyword-edges (context keywords)
   "Find edges of KEYWORDS in CONTEXT."
   (with-slots (items size db)
       context
     (let ((edges (create)))
-      (loop for keyword in keywords do
-           (loop for hash in (hash-keys (aref db keyword)) do
-                (let ((item-keywords
-                       (map (lambda (x) (aref x 0))
-                            (@ (aref items hash) :keywords))))
-                  (loop for target in keywords do
-                       (when (and (not (eql keyword target))
-                                  (find target item-keywords))
-                         (let ((name (edge-name (list keyword target))))
-                           (if #1=(aref edges name)
-                               (send push #1# hash)
-                               (setf #1# (list hash)))))))))
-      (map (lambda (e) (list (send split e "=>") (aref edges e)))
-           (hash-keys edges)))))
-
-(defun stroke-width (n)
-  (if (> n 12) (+ 2 (/ n 12)) (+ 0.3 (/ n 6))))
-
-(defun hsv-to-rgb (h s v)
-  (let* ((h-i (parse-int (* h 6)))
-         (f (- (* h 6) h-i))
-         (p (* v (- 1 s)))
-         (q (* v (- 1 (* f s))))
-         (tt (* v (- 1 (* (- 1 f) s)))))
-    (case h-i
-      (0 (list v tt p))
-      (1 (list q v p))
-      (2 (list p v tt))
-      (3 (list p q v))
-      (4 (list tt p v))
-      (5 (list v p q)))))
-
-(defvar *seed* (send random |Math|))
-(defvar *golden-ratio* 0.618033988749895)
-
-(defun color ()
-  (incf *seed* *golden-ratio*)
-  (setf *seed* (% *seed* 1))
-  (let ((rgb (hsv-to-rgb *seed* 0.5 0.95)))
-    (flet ((to-hex (n) (send to-string (parse-int (* n 256)) 16)))
-      (+ "#"
-         (to-hex (aref rgb 0))
-         (to-hex (aref rgb 1))
-         (to-hex (aref rgb 2))))))
+      (loop for keyword in keywords
+            for keyword-edges = (setf (aref edges keyword) (create))
+         do (loop for hash in (hash-keys (aref db keyword))
+                  for item = (aref items hash)
+               do (loop for (item-keyword . ()) in (@ item :keywords) do
+                       (when (and (not (eql item-keyword keyword))
+                                  (find item-keyword keywords))
+                         (if #1=(aref keyword-edges item-keyword)
+                             (incf #1#)
+                             (setf #1# 1)))))
+           (setf (aref edges keyword)
+                 (send sort (hash-keys keyword-edges)
+                       (lambda (x y)
+                         (> (aref keyword-edges x)
+                            (aref keyword-edges y))))))
+      edges)))
 
 (defun make-keywords ()
-  (let ((element (make-node :div)))
-    (setf (@ element |innerHTML|) "<svg><g></g></svg>")
+  (let ((span (make-node :ul)))
     (make-widget
-     element
+     span
      (lambda (context)
+       (clear-node span)
        (let* ((keywords (context-keywords context))
-              (edges (keyword-edges context keywords))
-              (graph (new ((@ dagre-d3 |Digraph|))))
-              (renderer (new ((@ dagre-d3 |Renderer|)))))
-         (loop for keyword in keywords do
-              (send add-node graph keyword (create :label keyword)))
-         (loop for (edge items) in edges do
-              (send add-edge graph null (aref edge 0) (aref edge 1)
-                    (create style (+ "stroke: " (color) "; "
-                                     "stroke-width: "
-                                     (stroke-width (@ items :length))
-                                     ";"))))
-         (send run renderer graph (send select d3 "svg g")))))))
+              (edges (context-keyword-edges context keywords)))
+         (loop for keyword in keywords
+               for keyword-edges = (aref edges keyword)
+            do (send append-child span
+                     (style
+                      (apply make-node :li
+                             (make-node :b keyword)
+                             (loop for edge in keyword-edges
+                                collect (make-text-node " ")
+                                collect (style
+                                         (make-node :a edge)
+                                         :font-size "xx-small"
+                                         :background (keyword-color edge)
+                                         :border "1px solid"
+                                         :border-radius "0.2em")))
+                      :background (keyword-color keyword)
+                      :border "1px solid white"
+                      :border-radius "0.2em"))))))))
 
 (defun query (context keywords)
   (let ((results nil))
     (loop for keyword in keywords
           for records = (aref (@ context :db) keyword)
-       if records
-       do (setf results (loop for hash in (hash-keys records)
-                              for item = (aref (@ context :items) hash)
-                           when (or (= results nil)
-                                    (find item results))
-                           collect item))
-       else do (setf results (list)))
+       do (if records
+              (setf results (loop for hash in (hash-keys records)
+                                  for item = (aref (@ context :items) hash)
+                               when (or (= results nil)
+                                        (find item results))
+                               collect item))
+              (setf results (list))))
     (when (and results (> (@ results :length) 0))
-      (send sort results (lambda (x y) (- (@ x :date) (@ y :date)))))))
+      (send sort results (lambda (x y) (- (@ x "DATE") (@ y "DATE")))))))
 
 (defun render-item (item)
-  (with-slots (date link title description keywords)
-      item
-    (let ((header (make-node :a title))
-          (words ""))
-      (send set-attribute header :href link)
-      (send set-attribute header :target "_blank")
-      (loop for keyword in keywords do
-           (incf words (+ (aref keyword 0) " ")))
-      (make-node
-       :details
-       (make-node :summary
-                  (make-node :em (send to-string (js-date date)))
-                  (make-node :br)
-                  header
-                  (make-node :br)
-                  (make-node :code words))
-       description))))
+  (let ((header (make-node :a (@ item "TITLE")))
+        (permalink (make-node :a "[link]"))
+        (words ""))
+    (send set-attribute header :href (@ item "LINK"))
+    (send set-attribute header :target "_blank")
+    (send set-attribute permalink :href (+ "/item/" (@ item :hash) ".html"))
+    (send set-attribute permalink :target "_blank")
+    (loop for keyword in (@ item :keywords) do
+         (incf words (+ (aref keyword 0) " ")))
+    (make-node
+     :details
+     (make-node :summary
+                (make-node :em (send to-string (js-date (@ item "DATE"))))
+                (make-node :br)
+                header " " permalink
+                (make-node :br)
+                (make-node :code words))
+     (@ item "DESCRIPTION"))))
 
 (defun make-query ()
   (let ((input (make-node :input))
@@ -430,10 +442,13 @@ CALLBACK."
                (if matches
                    (loop for item in matches
                          for li = (make-node :li (render-item item))
-                      do
-                        (style li clear "both"
-                                  padding-top "1em")
-                        (send append-child results li))
+                      do (send append-child results
+                               (style li
+                                      :background
+                                      (keyword-color
+                                       (first (first (@ item :keywords))))
+                                      :margin-top "0.5em"
+                                      :border-radius "0.2em")))
                    (send append-child results
                          (make-node :p "No matches."))))))
       (send set-attribute input :type :text)
@@ -449,6 +464,25 @@ CALLBACK."
                   results)
        update))))
 
+(defun make-add-feed ()
+  (let ((url (make-node :input))
+        (result (make-node :p)))
+    (flet ((add-feed ()
+             (clear-node result)
+             (post "/feed" (@ url :value)
+                   (lambda (request)
+                     (let ((a (make-node :a "Feed added!")))
+                       (send set-attribute a :href (@ request |responseURL|))
+                       (send append-child result a)))
+                   (lambda ()
+                     (send append-child result
+                           (make-text-node
+                            "Request failed, try again later?"))))))
+      (make-widget
+       (make-node :div
+                  url
+                  (widget-element (make-button "Add feed" add-feed))
+                  result)))))
 
 ;; Kickstart.
 (with-event (window :load) ()
@@ -458,31 +492,32 @@ CALLBACK."
          (timespan (make-timespan
                     (lambda (from to)
                       (try
-                       (let ((from (parse-date from))
-                             (to (parse-date to)))
+                       (let ((from (cl-date (parse-date from)))
+                             (to (cl-date (parse-date to))))
                          (cond
                            ((< to from)
                             (throw "Negative timeframe."))
-                           ((> (- to from) 518400)
+                           ((> (- to from) 604800)
                             (throw "Maximum timeframe is one week.")))
                          (with-context (context from to)
                            (update-widget keywords context)
                            (update-widget query context)))
                        (:catch (error)
-                         (alert (+ "Failure: " error))))))))
+                         (alert (+ "Failure: " error)))))
+                    (new (|Date| (- (new (|Date|)) (* 1000 60 60 24 7))))
+                    (new (|Date|))))
+         (add-feed (make-add-feed)))
     (send append-child body
           (widget-element *progress*))
     (send append-child body
-          (make-node :header (make-node :h3 "Athens Magnifier")))
+          (make-node :header (make-node :h1 "Athens Magnifier")))
     (send append-child body
           (make-node :header (make-node :b "Timeframe:")))
-    (append-widget (@ document :body) timespan)
-    (send append-child body (make-node :hr))
-    (send append-child body
-          (make-node :header (make-node :b "Prominent keywords:")))
-    (append-widget (@ document :body) keywords)
-    (send append-child body (make-node :hr))
+    (append-widget body timespan)
+    (append-widget body keywords)
     (send append-child body
           (make-node :header (make-node :b "Query by tokens:")))
-    (append-widget (@ document :body) query)))
-
+    (append-widget body query)
+    (send append-child body
+          (make-node :header (make-node :b "Add feed:")))
+    (append-widget body add-feed)))

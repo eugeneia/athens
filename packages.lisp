@@ -12,6 +12,7 @@
   (:documentation "Persistent records.")
   (:use :cl
         :ccl
+        :athens.hash
         :simple-date
         :postmodern)
   (:export :with-database
@@ -53,9 +54,12 @@
 	:trivial-utf-8
         :httpd0
 	:httpd0.responses
+        :httpd0.router
         :jonathan
         :athens.store
         :athens.widgets)
+  (:import-from :parenscript :ps-compile-file)
+  (:import-from :asdf :system-relative-pathname)
   (:export :athens-responder))
 
 (defpackage athens.service
