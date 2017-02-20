@@ -41,9 +41,10 @@
          :none hash (prin1-to-string feed)))
 
 (defun get-feed (hash)
-  (read-from-string
-   (query (sql (:select 'datum :from 'feed :where (:= 'hash '$1)))
-          :single! hash)))
+  (let ((datum (query (sql (:select 'datum :from 'feed :where (:= 'hash '$1)))
+                      :single hash)))
+    (when datum
+      (read-from-string datum))))
 
 (defun delete-feed (hash)
   (query (sql (:delete-from 'feed :where (:= 'hash '$1)))
@@ -66,9 +67,10 @@
          (universal-time-to-timestamp (getf item :date))))
 
 (defun get-item (hash)
-  (read-from-string
-   (query (sql (:select 'datum :from 'item :where (:= 'hash '$1)))
-          :single! hash)))
+  (let ((datum (query (sql (:select 'datum :from 'item :where (:= 'hash '$1)))
+                      :single hash)))
+    (when datum
+      (read-from-string datum))))
 
 (defprepared get-items-1
     (:order-by (:select 'hash 'datum :from 'item :where (:>= 'date '$1))
