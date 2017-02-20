@@ -11,7 +11,7 @@ function first (vector) {
 
 /* rest: Return tail of vector. */
 function rest (vector) {
-    if (vector.length === 0) return null;
+    if (vector.length < 2) return null;
     else return Array.prototype.slice.call(vector, 1);
 }
 
