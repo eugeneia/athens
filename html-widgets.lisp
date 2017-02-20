@@ -6,13 +6,9 @@
 
 (defparameter *scripts* '("/script"))
 
-(defparameter *stylesheets* '((:href "/style" :media "screen")))
-
 (defun html-widget-frontend ()
   "HTML widget for frontend application (Magnifier)."
-  (html (html-widget-head "Athens Magnifier"
-                          :scripts *scripts*
-                          :stylesheets *stylesheets*)
+  (html (html-widget-head "Athens Magnifier" :scripts *scripts*)
         (body)))
 
 (defun feed-path (hash)
@@ -34,6 +30,13 @@
       (format nil "~a…" (subseq string 0 (1- length)))
       string))
 
+(defun date-string (universal-time &key (include-timezone t))
+  (with-output-to-string (out)
+    (let ((date-string (universal-time-to-http-date universal-time)))
+      (write-string date-string out :start 0 :end (- (length date-string) 7)))
+    (when include-timezone
+      (write-string " GMT" out))))
+
 (defun html-widget-feed (feed)
   "HTML widget for FEED."
   (destructuring-bind (&key source link date title description)
@@ -43,25 +46,23 @@
      (lambda ()
        (when title
          (header (b title)))
-       (when description
-         (article (progn (write-string description)
-                         (values))))
        (aside
         (dl
          (dt "Source")
          (dd (a [:href source] (truncate-string source)))
          (dt "Last updated")
-         (dd (universal-time-to-http-date date))
+         (dd (date-string date))
          (when link
            (dt "Link")
            (dd (a [:href link] (truncate-string link))))))
-       (html-widget-footer))
-     :stylesheets *stylesheets*)))
+       (when description
+         (article (progn (write-string description)
+                         (values))))
+       (html-widget-footer)))))
 
 (defun html-widget-item (item)
   "HTML widget for ITEM."
-  (destructuring-bind
-        (&key feed link date author title description language)
+  (destructuring-bind (&key feed link date author title description language)
       item
     (html-widget-document
      (or title "Untitled")
@@ -74,7 +75,7 @@
            (dt "Author")
            (dd author))
          (dt "Date")
-         (dd (universal-time-to-http-date date))
+         (dd (date-string date))
          (when link
            (dt "Link")
            (dd (a [:href link] (truncate-string link))))
@@ -86,41 +87,22 @@
        (when description
          (article (progn (write-string description)
                          (values))))
-       (html-widget-footer))
-     :stylesheets *stylesheets*)))
+       (html-widget-footer)))))
 
 (defun html-widget-news (news)
   "HTML widget for NEWS."
   (destructuring-bind (&key start end items) news
     (let ((title (format nil "News between ~a and ~a"
-                         (universal-time-to-http-date start)
-                         (universal-time-to-http-date end))))
+                         (date-string start)
+                         (date-string end))))
       (html-widget-document
        title
        (lambda ()
          (header (b title))
          (if items
              (loop for (hash item) in items
-                do (p (date-string (getf item :date))
-                      " "
-                      (time-string (getf item :date) nil 0 nil)
-                      "—"
+                do (p (date-string (getf item :date) :include-timezone nil) "—"
                       (a [:href (item-path hash)]
                          (getf item :title))))
              (p "No news during that time."))
-         (html-widget-footer))
-       :stylesheets *stylesheets*))))
-
-(defun css-widget-style ()
-  (write-string
-   "body {
-    font-family: sans-serif;
-    padding: 0.5em;
-}
-h1 { color: #ccc;
-     margin: 0;
-     padding: 0;
-     text-align: right;
-     font-size: small; }
-
-"))
+         (html-widget-footer))))))

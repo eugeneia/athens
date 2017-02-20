@@ -34,15 +34,13 @@
   (:use :cl
         :macro-html
         :macro-html.widgets
-        :named-readtables
-        :net.telent.date
-        :pretty-string)
+        :named-readtables)
+  (:import-from :httpd0.responses :universal-time-to-http-date)
   (:shadow :map :time)
   (:export :html-widget-frontend
            :html-widget-feed
            :html-widget-item
-           :html-widget-news
-           :css-widget-style))
+           :html-widget-news))
 
 (defpackage athens.restful-responder
   (:documentation
@@ -51,15 +49,16 @@
         :ccl
         :erlangen-platform.log
         :erlangen-platform.socket-server
-	:trivial-utf-8
+        :athens.store
+        :athens.widgets
+        :flexi-streams
         :httpd0
 	:httpd0.responses
         :httpd0.router
-        :jonathan
-        :athens.store
-        :athens.widgets)
+        :jonathan)
   (:import-from :parenscript :ps-compile-file)
   (:import-from :asdf :system-relative-pathname)
+  (:shadow :make-external-format)
   (:export :athens-responder))
 
 (defpackage athens.service
@@ -76,8 +75,8 @@
         :trivial-feed
         :drakma
         :flexi-streams
-        :net.telent.date
         :sanitize)
+  (:import-from :httpd0.responses :universal-time-to-http-date)
   (:export :athens-service
            :initialize-database
            :add-feed

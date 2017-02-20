@@ -1,11 +1,17 @@
 (in-package :athens.service)
 
+(defun clean-html (html)
+  (clean html +basic+))
+
 (defun import-item (feed-hash item
                     &aux (link (getf item :link))
                          (item-hash (and link (url-hash link)))
+                         (description (getf item :description))
                          (item (list* :feed feed-hash item)))
   (if link
       (unless (item-recorded-p item-hash)
+        (when description
+          (setf (getf item :description) (clean-html description)))
         (insert-item item-hash item)
         (write-log `(:recorded ,item)))
       (write-log `(:ignored-item ,item))))
@@ -21,7 +27,7 @@
                                  :link link
                                  :date date
                                  :title title
-                                 :description (clean description +basic+))))
+                                 :description (clean-html description))))
   (values nil 'no-value))
 
 (defun feed-importer (db-connection)

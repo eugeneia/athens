@@ -31,22 +31,20 @@ includes «Accept-Charset» to favor UTF-8."
 (define-condition not-modified (condition) ())
 
 (defun http-get (url date timeout)
-  (with-flexi-use-value
-    (multiple-value-bind (body status)
-        (http-request url
-                      :method :get
-                      :redirect 1
-                      :additional-headers (headers date)
-                      :deadline (+ (* timeout internal-time-units-per-second)
-                                   (get-internal-real-time)))
-      (ecase status
-        (200 (etypecase body
-               (string body)
-               ((array (unsigned-byte 8)) (octets-to-string body))))
-        (304 (signal 'not-modified))))))
+  (multiple-value-bind (body status)
+      (http-request url
+                    :method :get
+                    :redirect 1
+                    :additional-headers (headers date)
+                    :deadline (+ (* timeout internal-time-units-per-second)
+                                 (get-internal-real-time)))
+    (ecase status
+      (200 body)
+      (304 (signal 'not-modified)))))
 
 (defun pull-feed (url if-modified-since timeout)
-  (handler-case (parse-feed (http-get url if-modified-since timeout))
+  (handler-case (with-flexi-use-value
+                  (parse-feed (http-get url if-modified-since timeout)))
     (:no-error (feed)
       (write-log `(:got ,url))
       (cast :importer (list* :source url feed)))
@@ -56,21 +54,21 @@ includes «Accept-Charset» to favor UTF-8."
     (error (error)
       (write-log `(:fail ,url ,error)))))
 
-(defun pull-feeds (db-configuration concurrent-requests get-timeout)
+(defun pull-feeds (db-configuration concurrent-requests request-timeout)
   (with-database db-configuration
     (map-spawn (lambda (hash)
                  (destructuring-bind (&key source date &allow-other-keys)
                      (get-feed hash)
-                   `(pull-feed ,source ,date ,get-timeout)))
+                   `(pull-feed ,source ,date ,request-timeout)))
                (feed-index)
                :level concurrent-requests)))
 
 (defun feed-fetcher (db-configuration &key (pull-interval 3600)
                                            (concurrent-requests 10)
-                                           (get-timeout 5))
+                                           (request-timeout 5))
   (send `(:pull ,(agent) :repeat ,pull-interval) :fetch-timer)
   (loop do (ecase (receive :timeout (* pull-interval 2))
              (:pull (write-log :pull)
                     (pull-feeds db-configuration
                                 concurrent-requests
-                                get-timeout)))))
+                                request-timeout)))))

@@ -19,19 +19,17 @@
                       :depends-on ("packages"))
                (:file "service"
                       :depends-on ("packages" "importer" "fetcher")))
-  :depends-on ("trivial-feed"
-               "configuration"
+  :depends-on ("asdf"
                "flexi-streams"
                "ironclad"
                "drakma"
                "postmodern"
                "simple-date"
-               "net-telent-date"
+               "jonathan"
+               "parenscript"
+               "sanitize"
+               "trivial-feed"
+               "configuration"
                "erlangen-platform"
                "httpd0"
-               "jonathan"
-               "macro-html"
-               "pretty-string"
-               "parenscript"
-               "asdf"
-               "sanitize"))
+               "macro-html"))
