@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF 
+					 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+					 xmlns="http://purl.org/rss/1.0/"
+					 xmlns:dc="http://purl.org/dc/elements/1.1/"
+					>
+<channel rdf:about="http://africaclimatesolution.org"><title>RSS 1.0 Feed</title>
+<link>http://africaclimatesolution.org</link>
+<description><![CDATA[ACCID News Feed]]></description>
+<items>
+<rdf:Seq>
+<rdf:li resource="http://africaclimatesolution.org/news.php?id=7906"/>
+<rdf:li resource="http://africaclimatesolution.org/news.php?id=7905"/>
+<rdf:li resource="http://africaclimatesolution.org/news.php?id=7901"/>
+<rdf:li resource="http://africaclimatesolution.org/news.php?id=7904"/>
+<rdf:li resource="http://africaclimatesolution.org/news.php?id=7903"/>
+<rdf:li resource="http://africaclimatesolution.org/news.php?id=7902"/>
+<rdf:li resource="http://africaclimatesolution.org/news.php?id=7899"/>
+</rdf:Seq>
+</items>
+</channel>
+<item rdf:about="http://africaclimatesolution.org/news.php?id=7906">
+<title>Fields of tears in Lesotho as new tool is introduced to help mitigate climate change </title>
+<link>http://africaclimatesolution.org/news.php?id=7906</link>
+<dc:date>2013-10-01</dc:date>
+<description><![CDATA[After last season&rsquo;s disastrous harvest, which delivered a fraction of previous yields, deep in Lesotho&rsquo;s Ts&rsquo;akholo village in Mafeteng district, Matsolo Sebusi&rsquo;s husband has had to leave the family home to seek mining work in South Africa&rsquo;s platinum belt of Rustenburg.
+Climate change has left farmers in this village fearful for their future, and as result some have opted to sell their animals and abandon their plots for urban areas in search of employment...]]></description>
+</item>
+<item rdf:about="http://africaclimatesolution.org/news.php?id=7905">
+<title>New deal to empower women farmers in East Africa</title>
+<link>http://africaclimatesolution.org/news.php?id=7905</link>
+<dc:date>2013-04-02</dc:date>
+<description><![CDATA[In Kenya, farmers lack proper information on best farming practices which has been contributing to the dwindling farm harvests
+Special report by Xinhua Correspondent Ejidiah Wangui
+Nakuru (Xinhua): Veronicah Kihanya knows no other tools of trade apart from her two-acre piece of land and her jembe.
+Her small farm at the heart of little known Gilgil in Nakuru County has been the source of her income in her entire life...]]></description>
+</item>
+<item rdf:about="http://africaclimatesolution.org/news.php?id=7901">
+<title>African women benefit from jobs in agricultural supply chains</title>
+<link>http://africaclimatesolution.org/news.php?id=7901</link>
+<dc:date>2013-03-31</dc:date>
+<description><![CDATA[By Anna Reynolds
+Agricultural supply chains are supporting women across Africa by giving them greater independence and offering more choice in life, according to research by food processor Olam.
+Olam, an international firm whose products include coffee, rice and sugar, carried out a survey in February of 5,971 women working in its cashew processing plants in Nigeria, Tanzania, Mozambique, Ivory Coast and India...]]></description>
+</item>
+<item rdf:about="http://africaclimatesolution.org/news.php?id=7904">
+<title>Time for recognition: Building on the progress at CSW57 to empower women in agriculture </title>
+<link>http://africaclimatesolution.org/news.php?id=7904</link>
+<dc:date>2013-03-27</dc:date>
+<description><![CDATA[By Annette Engelund Friis, Manager, Climate Change Policy, Danish Agriculture &amp; Food Council
+From March 4-15, the UN Commission on the Status of Women was held in New York, this is the 57th annual meeting where influential spokespeople from around the world discuss the issue of female empowerment...]]></description>
+</item>
+<item rdf:about="http://africaclimatesolution.org/news.php?id=7903">
+<title>Africa: Women key in global growth</title>
+<link>http://africaclimatesolution.org/news.php?id=7903</link>
+<dc:date>2013-03-18</dc:date>
+<description><![CDATA[By Warren Nyamugasira
+Opinion
+The day of reckoning has come round yet again. On behalf of the world, the United Nations has set up a process for thinking about the next big thing to succeed the current Millennium Development Goals (MDGs) due to end two years.
+When at the turn of the new Millennium, MDGs were adopted by over 189 countries...]]></description>
+</item>
+<item rdf:about="http://africaclimatesolution.org/news.php?id=7902">
+<title>Airtel Africa partners with UN women</title>
+<link>http://africaclimatesolution.org/news.php?id=7902</link>
+<dc:date>2013-03-05</dc:date>
+<description><![CDATA[By Marc Mcilhone
+Women farmers in the East and Horn of Africa region are poised to benefit from practical information-sharing tools via Airtel&rsquo;s mobile networks.
+
+Airtel Africa signs MOU with UN WOMEN on initiatives to promote the empowerment of women and girls
+Airtel will establish a Farmer's Information System which will provide real time information to women farmers through its network in Africa
+
+Women farmers in the East and Horn of Africa region are poised to benefit from practical information-sharing tools via Airtel's mobile networks (http://www...]]></description>
+</item>
+<item rdf:about="http://africaclimatesolution.org/news.php?id=7899">
+<title>Summary of Outcomes: Agriculture, Landscapes and Livelihoods Day</title>
+<link>http://africaclimatesolution.org/news.php?id=7899</link>
+<dc:date>2012-12-11</dc:date>
+<description><![CDATA[Experts, practitioners, civil society, researchers and others gathered to  discuss issues related to food security, climate change and rural development on  3 December at ALL-5 Day. The fifth edition of the event offered a mix of policy  discussions, &lsquo;Big Ideas&rsquo;, and networking opportunities...]]></description>
+</item>
+</rdf:RDF>
