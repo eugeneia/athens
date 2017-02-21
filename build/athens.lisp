@@ -1,6 +1,4 @@
-(require :asdf)
-
-(asdf:load-system :athens)
+(ql:quickload :athens)
 
 (defun athens ()
   (when (intersection *command-line-argument-list*
