@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title>  Moving from Atom 0.3 to 1.0 | rakaz</title>
+
+		<meta name="author" content="Niels Leenheer" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</head>
+
+	<body>
+		<div id="page">
+			<header>
+				<p class="blogtitle"><a class="hidelink" href="http://rakaz.nl/">rakaz</a></p>
+				<p class="description">about standards, webdesign, usability and open source</p>
+			</header>
+
+	<div id="content" class="narrowcolumn">
+
+		
+		<div class="post" id="post-69">
+		
+			
+			<h1>Moving from Atom 0.3 to 1.0</h1>
+			<p class="postdate">Thursday, 21 July 2005</p>
+
+			<div class="entry">
+				<p>Now that the Atom 1.0 specification is pretty much final and waiting for approval we are going to see a lot of people moving from Atom 0.3 to Atom 1.0. Many people will automatically move to Atom 1.0 when they upgrade their weblog software, or when large weblog providers such as Blogger update their software. The rest of us, who are going to change our feeds manually are going to run into a number of differences between Atom 0.3 and Atom 1.0.</p>
+<p><span id="more-69"></span></p>
+<p>Below I will highlight some of the main changes. This is a guideline to help you update your feed and make it validate. This is by no means a complete description of Atom 1.0. It does not contain a complete list of all changes and all new elements. If you want to know every little detail about the Atom 1.0 standard you need to read <a href="http://atompub.org/">the specification</a> itself.</p>
+<h3>The feed element</h3>
+<p>In version 0.3, the <code>feed</code> element used to define the version number and the XML namespace. In the new Atom 1.0 specification the <code>feed</code> element still exists, but there are a couple of changes.</p>
+<p>One of the first things you will notice is that Atom 1.0 uses a new XML namespace. The version 0.3 namespace used to be <code>http://purl.org/atom/ns#</code>, which you are going to have to change to <code>http://www.w3.org/2005/Atom</code>.</p>
+<p>The next change is that the <code>version</code> attribute is dropped. This attribute used to indicate which version of the Atom specification was used. From now on this will be handled by the namespace, I believe. If you want your feed to validate properly you are going to have to delete this attribute.</p>
+<h3>The id element</h3>
+<p>There are not many changes to the <code>id</code> element, except that it is now required for both the main <code>feed</code> element, as for all the <code>entry</code> elements. So, if your feed does not already use an id for both these elements, you must add them now. If you want more information about generating proper ids for your Atom feed, read the article <a href="http://diveintomark.org/archives/2004/05/28/howto-atom-id">How to make a good ID in Atom</a> by Mark Pilgrim.</p>
+<h3>The author element</h3>
+<p>Your <code>feed</code> element must contain an <code>author</code> element, unless all <code>entry</code> elements contain an <code>author</code> element. This has not changed, but it is now allowed to use more than one <code>author</code> element. For example, if you wrote an article together with another person, you could add two <code>author</code> elements. One for yourself and one for the other author.</p>
+<h3>The <del>tagline</del> subtitle element</h3>
+<p>The Atom 0.3 specification defined a <code>tagline</code> element which was used to convey a human-readable description for the feed. This element was renamed to <code>subtitle</code> in the Atom 1.0 specification.</p>
+<h3>The <del>copyright</del> rights element</h3>
+<p>The Atom 0.3 <code>copyright</code> element is also renamed in the Atom 1.0 spec. The new element is called <code>rights</code>. One other change is that the <code>rights</code> element is now also allowed in <code>entry</code> elements, while previously it was restricted to the <code>feed</code> element.</p>
+<h3>The generator element</h3>
+<p>The <code>url</code> attribute of this element was renamed to <code>uri</code>. If your feed contains a <code>generator</code> element, you must also rename the <code>url</code> attribute to <code>uri</code>, otherwise the feed will not validate.</p>
+<h3>The <del>info</del> element</h3>
+<p>The <code>info</code> element is completely removed from the Atom 1.0 spec and has not been replaced with another element. If you use <code>info</code> elements in your old Atom 0.3 feed, you should remove them.</p>
+<h3>The <del>modified</del> updated element</h3>
+<p>The <code>modified</code> element was renamed to <code>updated</code> in the Atom 1.0 spec. The <code>updated</code> element is still required for the <code>feed</code> element and each <code>entry</code> element, but the date no longer has to be in the UTC timezone. One major change is also that the <code>updated</code> element no longer needs to be changed for each modification. You can decide for yourself which modification warrants a change to the <code>updated</code> element.</p>
+<h3>The <del>issued</del> published element</h3>
+<p>The <code>issued</code> element was also renamed. This element is now called <code>published</code> and is no longer required for each <code>entry</code> element.</p>
+<h3>The <del>created</del> element</h3>
+<p>This element is the second that has been dropped from the Atom 1.0 specification and if your feed uses this element you need to remove it.</p>
+<h3>The link element</h3>
+<p>There are a number of changes to the <code>link</code> element, but mostly they are additions, such as the <code>hreflang</code> and <code>length</code> attribute.</p>
+<p>One change is that the value of <code>rel</code>, the relationship of the link to the feed or entry, is no longer defined by the Atom API specification, instead they should be registered with the IANA. The Atom 1.0 specification does define five initial relationships of which the first already existed: <code>alternate</code>, <code>related</code>, <code>self</code>, <code>enclosure</code> and <code>via</code>. The <code>rel</code> attribute is also not required anymore, just like the <code>type</code> attribute.</p>
+<p>In case of the <code>feed</code> element there are two changes: a link with the relationship of <code>alternative</code> is no longer required. Instead it is highly recommended to add a link with the relationship <code>self</code>, which points to the IRI where this feed can be retrieved.</p>
+<h3>The category element</h3>
+<p>Until recently it was not possible to defined categories or tags in Atom. Some people created a workaround for this by importing the Dublin Core namespace and using its <code>subject</code> element. This is no longer needed, because as of version 1.0 Atom now includes the <code>category</code> element.</p>
+<p>The <code>category</code> element can occur multiple times within a <code>feed</code> or <code>entry</code> elements. The precise contents of the <code>term</code>, <code>scheme</code> and <code>label</code> attributes are not defined and could look like this:</p>
+<pre>&lt;entry&gt;
+   &lt;title&gt;Moving from Atom 0.3 to 1.0&lt;/title&gt;
+   &lt;link rel='alternate' src='http://www.rakaz.nl/nucleus/item/103' /&gt;
+   &lt;category term='atom' scheme='http://www.rakaz.nl/nucleus/tags' /&gt;
+   &lt;category term='feed' scheme='http://www.rakaz.nl/nucleus/tags' /&gt;
+   &lt;category term='standards' scheme='http://www.rakaz.nl/nucleus/tags' /&gt;
+   ...</pre>
+<h3>Person constructs: the name, <del>url</del> uri and email elements</h3>
+<p>In an effort to rename all occurrences of URL to URI, the <code>url</code> element was also renamed. The new <code>uri</code> element functions in exactly the same way as the <code>url</code> element used to do, so the only thing you will have to do is rename all <code>url</code> elements.</p>
+<h3>Text contructs: the title, <del>tagline</del> subtitle, summary and content elements</h3>
+<p>One of the big changes between Atom 0.3 and Atom 1.0 is the way <em>text constructs</em> are defined, starting with the name. <em>Text constructs</em> were initially called <em>Content constructs</em>.</p>
+<p>Atom 1.0 defines that <em>text constructs</em> have a <code>type</code> attribute which can be one of the following values: <code>text</code>, <code>html</code>, <code>xhtml</code>. In addition to that, the <code>content</code> element can also contain a MIME media type as the value of the <code>type</code> attribute. The <code>mode</code> attribute has been removed by the Atom 1.0 specification.</p>
+<table border="0" cellspacing="0" summary="Overview of changes between Atom 0.3 and 1.0 for text contructs">
+<thead>
+<tr>
+<th colspan="2">Version 0.3</th>
+<th>Version 1.0</th>
+</tr>
+<tr>
+<th><code>type</code></th>
+<th><code>mode</code></th>
+<th><code>type</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text/plain</td>
+<td>escaped</td>
+<td>text</td>
+</tr>
+<tr>
+<td>text/html</td>
+<td>escaped</td>
+<td>html</td>
+</tr>
+<tr>
+<td>application/xhtml+xml</td>
+<td>xml</td>
+<td>xhtml</td>
+</tr>
+<tr>
+<td>application/xml</td>
+<td>xml</td>
+<td>application/xml</td>
+</tr>
+<tr>
+<td>application/mathml+xml</td>
+<td>xml</td>
+<td>application/mathml+xml</td>
+</tr>
+<tr>
+<td>image/svg+xml</td>
+<td>xml</td>
+<td>image/svg+xml</td>
+</tr>
+<tr>
+<td>image/png</td>
+<td>base64</td>
+<td>image/png</td>
+</tr>
+<tr>
+<td>application/pdf</td>
+<td>base64</td>
+<td>application/pdf</td>
+</tr>
+</tbody>
+</table>
+<p>In the table above you can see how the new values of <code>type</code> map to the old <code>type</code> / <code>mode</code> combinations. If your feed uses a different combination of <code>type</code> and <code>mode</code>, you may need to read the new specification carefully to determine how you must change the content of your feed.</p>
+<p>The value <code>text</code> is used by default if the <code>type</code> attribute is not defined in the <em>text contruct</em>.</p>
+<h3>Conclusion</h3>
+<p>It is not easy to determine how much work it will take to convert your Atom 0.3 feed to Atom 1.0. It depends on which features your feed uses, but it most cases it will require only relatively few changes. Atom 1.0 is not a completely new standard, and despite that it is not compatible with Atom 0.3 in many ways, you can clearly see that the new standard is a descendant of the work done by Mark Nottingham and many others on the Atom wiki little more than a year and a half ago.</p>
+
+			</div>
+                      
+		</div>
+	</body>
+</html>
