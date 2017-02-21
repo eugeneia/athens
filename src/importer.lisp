@@ -1,7 +1,13 @@
 (in-package :athens.service)
 
-(defun clean-html (html)
-  (clean html +basic+))
+(defun clean-html (html &aux (error-output *error-output*))
+  (let ((errors (make-array
+                 0 :element-type 'character :adjustable t :fill-pointer t)))
+    (handler-bind ((error (lambda (error)
+                            (declare (ignore error))
+                            (write-string errors error-output))))
+      (with-output-to-string (*error-output* errors)
+        (return-from clean-html (clean html +basic+))))))
 
 (defun import-item (feed-hash item
                     &aux (link (getf item :link))
