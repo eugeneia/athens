@@ -1,0 +1,124 @@
+See the [httpd0 API documentation](api.html) for a complete API
+specification.
+
+< Using httpd0 to serve files
+
+ {make-resource-responder} is a file serving backend for httpd0. To serve
+ files under the directory {#p"/var/foo/"} for instance, use {make-httpd}
+ in combination with {make-resource-responder}.
+
+ #code Our server instance is bound to {*httpd*}.#
+ (defvar *httpd*
+   (make-httpd (make-resource-responder #p"/var/foo/")))
+ #
+
+ The HTTP server instance will now listen on {*:8080} (port 8080 on all
+ hosts). To stop the server instance use {destroy-httpd}.
+
+ #code Stop listening and free resources of {*httpd*}.#
+ (destroy-httpd *httpd*)
+ #
+
+ {make-httpd} can be configured by supplying keyword parameters. The parameters
+ {:host} and {:port} specify on which host address the underlying socket will
+ listens.
+
+ The special variables {*request-timeout*} and {*request-size*} control
+ the maximum amount of time waited for a request to be sent and the
+ maximum size of requests to be accepted respectively. The special
+ variable {httpd0.responses:*text-mime*} controls the _MIME type_ of
+ error and directory listing responses.
+
+ The MIME type of individual files is determined by {file-types}¹. Consult its
+ respective documentation on how to extend the file extension database.
+
+>
+
+
+< httpd0 concurrency
+
+ httpd0's concurrency model is based on a _thread pool_². The
+ {:n-threads} keyword parameter to {make-httpd} controls the number of
+ threads used for responding to requests. On the socket level, the
+ keyword parameter {:socket-backlog} to {make-httpd} sets the packet
+ backlog size of the underlying socket.
+
+>
+
+
+< Writing custom responders
+
+ {make-resource-responder}, as shown above, is a responder implementation
+ for httpd0. Writing a custom responder is trivial, all the tools you
+ need can be found in the {httpd0.responses} package.
+
+ A httpd0 responder is a function that will be called to handle every
+ valid request. It has to accept two arguments, {resource} and
+ {if-modified-since}. The {resource} argument will be a _pathname_
+ representing the resource path of the request while {if-modified-since}
+ will be the parsed date specified in the requests' {If-Modified-Since}³
+ header or {nil} if none was specified. The {resource} argument will
+ always be a relative pathname, beware that its {pathname-directory} may
+ contain {:up}.
+
+ Consider this minimal example of a responder:
+
+ #code Definition of {example-responder}.#
+ (defpackage example-responder
+   (:use :cl :httpd0.responses :trivial-utf-8)
+   (:export :responder))
+
+ (in-package :example-responder)
+
+ (defun responder (resource if-modified-since)
+   (declare (ignore if-modified-since)) ; We don't use it.
+   (cond
+
+     ;; If REQUEST is #p"hello/<string>" respond with "Hello <string>!".
+     ((equal '(:relative "hello") (pathname-directory resource))
+      (let ((response (string-to-utf-8-bytes
+                       (format nil "Hello ~a!~%"
+                               (pathname-name resource)))))
+        (respond-ok ((length response) *text-mime* (get-universal-time))
+          (write-sequence response *standard-output*))))
+
+     ;; Otherwise respond with status code 404.
+     (t (respond-not-found))))
+ #
+
+ The responder defined above dispatches a plain text response for _URIs_
+ that match the {/hello/*} pattern, all other requests are responded to
+ with _status code_ 404. Note how the body of {respond-ok} writes an
+ _octet sequence_ to {*standard-output*}. The call to {respond-ok} also
+ expects the byte size of the response body, its MIME type and a date
+ which designates the time the resource was last modified. For
+ simplicity, the responder ignores the {if-modified-since} argument and
+ always reports the current time as the last modified date.
+
+ To test the responder defined above launch an httpd0 instance and visit
+ [http://localhost:8080/hello/Frank]:
+
+ #code Using {example-responder}.#
+ (make-httpd #'example-responder:responder)
+ #
+
+ To summarize, the responder is required to:
+
+ + Use the {respond-*} routines from {httpd0.responses} (or roll their
+   own).
+ + Supply the correct byte size of the response, the MIME type and a
+   write date to {respond-ok}. The supplied write date must designate
+   the date at which the requested resource was last modified.
+ + In the body of {respond-ok}, write the response body as octets to
+   {*standard-output*}.
+
+ In return httpd0 will respond to GET and HEAD requests correctly. To
+ view the complete set of {respond-*} routines consult the
+ [httpd0 API](api.html).
+
+>
+
++ 1. [file-types](/software/file-types/)
++ 2. [q-thread-pool](/software/q-thread-pool/)
++ 3. [If-Modified-Since](http://www.w3.org/Protocols/HTTP/1.0/spec.html#If-Modified-Since)
+
