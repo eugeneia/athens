@@ -13,18 +13,23 @@
                       :depends-on ("packages"))
                (:file "restful-responder"
                       :depends-on ("packages" "store"))
-               (:file "athens"
-                      :depends-on ("packages" "hash" "store")))
-  :depends-on ("trivial-feed"
-               "configuration"
+               (:file "importer"
+                      :depends-on ("packages"))
+               (:file "fetcher"
+                      :depends-on ("packages"))
+               (:file "service"
+                      :depends-on ("packages" "importer" "fetcher")))
+  :depends-on ("asdf"
                "flexi-streams"
                "ironclad"
                "drakma"
-               "cl-fad"
                "postmodern"
                "simple-date"
-               "net-telent-date"
+               "jonathan"
+               "parenscript"
+               "sanitize"
+               "trivial-feed"
+               "configuration"
+               "erlangen-platform"
                "httpd0"
-               "jsown"
-               "macro-html"
-               "pretty-string"))
+               "macro-html"))

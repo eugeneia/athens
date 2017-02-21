@@ -7,12 +7,11 @@
            :name "athens" ; Optional, defaults to "athens".
            :use-ssl :yes) ; Optional, defaults to :NO.
 
-:update-interval 3600 ; Optional, defaults to one hour (in seconds).
+:feed (:pull-interval 3600 ; Optional, defaults to one hour (in seconds).
+       :concurrent-requests 10 ; Optional, defaults to 10.
+       :request-timeout 5) ; Optional, defaults to five seconds.
 
-:httpd0 (:host usocket:*wildcard-host* ; Optional, defaults to
-                                       ; usocket:*wildcard-host*.
-         :port 8080 ; Optional, defaults to 8080.
-         :n-threads 16 ; Optional, defaults to 16.
-         :socket-backlog 32) ; Optional, defaults to 32.
-
-:debug nil ; Optional, defaults to NIL.
+:server (:host "localhost" ; Optional, defaults to "localhost".
+         :port 8000 ; Optional, defaults to random port.
+         :n-responders 8 ; Optional, defaults to 1.
+         :socket-arguments (:keepalive t)) ; Optional, defaults to nil.

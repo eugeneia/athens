@@ -9,8 +9,10 @@
   (:export :url-hash))
 
 (defpackage athens.store
-  (:documentation "Persistent logging and records.")
+  (:documentation "Persistent records.")
   (:use :cl
+        :ccl
+        :athens.hash
         :simple-date
         :postmodern)
   (:export :with-database
@@ -22,15 +24,9 @@
            :delete-feed
            :create-item-table
            :item-recorded-p
-           :record-item
+           :insert-item
            :get-item
-           :get-items
-           :create-log-table
-           :log-imports
-           :get-imports
-           :create-global-date-table
-           :get-global-date
-           :update-global-date))
+           :get-items))
 
 (defpackage athens.widgets
   (:documentation
@@ -38,11 +34,11 @@
   (:use :cl
         :macro-html
         :macro-html.widgets
-        :named-readtables
-        :net.telent.date
-        :pretty-string)
+        :named-readtables)
+  (:import-from :httpd0.responses :universal-time-to-http-date)
   (:shadow :map :time)
-  (:export :html-widget-feed
+  (:export :html-widget-frontend
+           :html-widget-feed
            :html-widget-item
            :html-widget-news))
 
@@ -50,32 +46,42 @@
   (:documentation
    "RESTful resource responder.")
   (:use :cl
-	:trivial-utf-8
-	:httpd0.responses
-        :jsown
+        :ccl
+        :erlangen-platform.log
+        :erlangen-platform.socket-server
         :athens.store
-        :athens.widgets)
-  (:export :make-athens-responder))
+        :athens.widgets
+        :flexi-streams
+        :httpd0
+	:httpd0.responses
+        :httpd0.router
+        :jonathan)
+  (:import-from :parenscript :ps-compile-file)
+  (:import-from :asdf :system-relative-pathname)
+  (:shadow :make-external-format)
+  (:export :athens-responder))
 
-(defpackage athens
-  (:documentation "News archiver for syndication feeds.")
+(defpackage athens.service
   (:use :cl
+        :erlangen
+        :erlangen-platform.log
+        :erlangen-platform.supervisor
+        :erlangen-platform.timer
+        :erlangen-platform.server
+        :erlangen-platform.socket-server
         :athens.hash
         :athens.store
         :athens.restful-responder
-        :configuration
         :trivial-feed
         :drakma
-        :net.telent.date
         :flexi-streams
-        :httpd0
-        :pretty-string)
-  (:export :with-configuration
-           :with-configuration-file
+        :sanitize)
+  (:import-from :httpd0.responses :universal-time-to-http-date)
+  (:export :athens-service
            :initialize-database
            :add-feed
-           :remove-feed
-           :update-archive
-           :update-archive-periodically
-           :archive-log
-           :make-server))
+           :remove-feed))
+
+(defpackage athens.magnifier
+  (:use :cl :parenscript)
+  (:shadow :string))

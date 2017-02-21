@@ -1,0 +1,1490 @@
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>RSS 0.91 Specification (Netscape)</title>
+<style type="text/css" media="screen">
+@import url("http://www.rssboard.org/images/stylesheet.css");
+</style>
+<style type="text/css" media="screen">
+@import url("http://www.rssboard.org/images/spec-stylesheet.css");
+</style>
+<link rel="alternate" type="application/rss+xml" title="RSS Advisory Board" href="http://feeds.rssboard.org/rssboard" />
+<meta name="robots" content="noodp" /><meta name="description" content="The RSS 0.91 specification, published by Netscape on July 10, 1999." />
+</head>
+<body>
+<script type="text/javascript">
+window.google_analytics_uacct = "UA-631537-4";
+</script>
+<!-- ukey="13C1F4FD" -->
+<!-- Begin Page -->
+<div class="page">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr valign="top">
+<td>
+<p class="titlebar"><a href="/"><img src="/images/rss-advisory-board.gif" width="726" height="103" border="0" alt="RSS Advisory Board" /></a></p>
+<div class="main">
+<!-- Begin Google AdSense -->
+<p align="center"><script type="text/javascript"><!--
+google_ad_client = "pub-8378161688790357";
+/* RSS Board, 728x90, created 10/30/10 */
+google_ad_slot = "8997688149";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></p>
+<!-- End Google AdSense -->
+<!-- Begin Main Content -->
+<div class="specification">
+<h3>RSS 0.91 Specification</h3>
+
+<p class="fineprint">Archivist's Note: This is the RSS 0.91 specification published by Netscape on July 10, 1999. The current version of the RSS 2.0 specification is available at <a href="http://www.rssboard.org/rss-specification">this link</a> and <a href="http://www.rssboard.org/rss-history">other revisions</a> have been archived. Netscape <a href="http://www.rssboard.org/news/181/rss-090-091-moving-rss-advisory-board">transferred</a> this specification to the RSS Advisory Board on Jan. 22, 2008.</p>  
+
+<p>RSS 0.91 Spec, revision 3<br />
+Netscape Communications<br />
+Primary Author: Dan Libby<br />
+July 10, 1999</p>
+
+<h4>Notes</h4>
+
+<p>Files must be 100% valid XML. We're trying to move towards a more standard format, and to this end we have included several tags from the popular &lt;scriptingNews&gt; format. We have also ensured that this version is 100% valid XML. We did this by requiring that a DOCTYPE tag be included, and validating each RSS document against that DTD. This means that it is not enough for an RSS document to be "well-formed". It must also be "valid" with respect to its DTD.</p>
+ 
+<p>No mixed content tags. We are specifically not including any tags that contain mixed content in RSS 0.91. This means that each tag either contains sub-tags only, or text only, not a combination. This is both because we want to keep the format simple, and because our current validation system is not able to handle this type of tag. We also are not allowing any HTML markup beyond the commonly used entities such as &amp;quot; A full list of these are defined in the RSS 0.91 DTD.</p> 
+
+<p>New tags for syndication community. Our validator will now allow several new tags through the system, though most of them will not actually be used by Netcenter. However, these may work when syndicating content to other sites. These tags are noted explicitly in the spec as "ignored."</p>
+ 
+<p>RDF references removed. RSS was originally conceived as a metadata format providing a summary of a website. Two things have become clear: the first is that providers want more of a syndication format than a metadata format. The structure of an RDF file is very precise and must conform to the RDF data model in order to be valid. This is not easily
+human-understandable and can make it difficult to create useful RDF files. The second is that few tools are available for RDF generation, validation and processing. For these reasons, we have decided to go with a standard XML approach.</p>
+
+<h4>Specification</h4>
+
+<p>Tags in alphabetical order.</p>
+
+<h4 id="channel">&lt;channel&gt;</h4>
+<h5>Description</h5>
+<p>information about a particular channel. Everything pertaining to
+an individual channel is contained within this tag.</p>
+<h5>Netcenter Usage</h5>
+<p>Currently displayed on "My Netscape". May use in other locations in the future.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<ul>
+<li>required:
+<ul>
+<li><a href="#description">description</a></li>
+<li><a href="#language">language</a></li>
+<li><a href="#link">link</a></li>
+<li><a href="#title">title</a></li>
+</ul>
+</li>
+<li>optional:
+<ul>
+<li><a href="#copyright">copyright</a></li>
+<li><a href="#docs">docs</a></li>
+<li><a href="#image">image</a></li>
+<li><a href="#item">item</a></li>
+<li><a href="#lastBuildDate">lastBuildDate</a></li>
+<li><a href="#managingEditor">managingEditor</a></li>
+<li><a href="#pubDate">pubDate</a></li>
+<li><a href="#rating">rating</a></li>
+<li><a href="#skipDays">skipDays</a></li>
+<li><a href="#skipHours">skipHours</a></li>
+<li><a href="#textinput">textinput</a></li>
+<li><a href="#webMaster">webMaster</a></li>
+</ul>
+</li>
+</ul>  
+<h5>Examples</h5>
+<p>See <a href="#example1">example 1</a></p>
+
+<h4 id="copyright">&lt;copyright&gt;</h4>
+<h5>Description</h5>
+<p>copyright string</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example2">example 2</a></p>
+
+<h4 id="day">&lt;day&gt;</h4>
+<h5>Description</h5>
+<p>The day of the week, spelled out in English.</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example2">example 2</a></p>
+
+<h4 id="description">&lt;description&gt;</h4>
+<h5>Description</h5>
+<p>a plain text description of an item, channel, image, or textinput.</p>
+<h5>Netcenter Usage</h5>
+<p>displayed as appropriate depending on context.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example1">example channels</a></p>
+
+<h4 id="docs">&lt;docs&gt;</h4>
+<h5>Description</h5>
+<p>This tag should contain a URL that references a description of the channel.</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example2">example 2</a></p>
+
+<h4 id="DOCTYPE">&lt;!DOCTYPE&gt;</h4>
+<h5>Description</h5>
+<p>Document Type Identifier. This is an XML tag that identifies where to find the definition for this format. It should follow the <a href="#xml">xml</a> tag. The full DTD is <a href="#dtd">here.</a></p>
+<h5>Netcenter Usage</h5>
+<p>required to ensure document validity</p>
+<h5>Attributes</h5>
+<ul>
+<li>1 of these two formats is required:
+<ul>
+<li>rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" ""</li>
+<li>rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd"</li>
+</ul>
+</li>
+</ul>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p class="example">
+&lt;!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+</p>
+<p class="example">
+&lt;!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "">
+</p>
+
+<h4 id="height">&lt;height&gt;</h4>
+<h5>Description</h5>
+<p>Specifies the height of an <a href="#image">image</a>. Should be an integer value.</p>
+<h5>Netcenter Usage</h5>
+<p>The value must be between 1 and 400. If omitted, the default value is 31.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#image">image</a></p>
+
+<h4 id="hour">&lt;hour&gt;</h4>
+<h5>Description</h5>
+<p>Specifies an hour of the day. Should be an integer value between 0 and 23. See <a href="#skipHours">skipHours</a>.</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#skipHours">skipHours</a></p>
+
+<h4 id="image">&lt;image&gt;</h4>
+<h5>Description</h5>
+<p>Specifies an image associated with a <a href="#channel">channel</a>.</p>
+<h5>Netcenter Usage</h5>
+<p>Optionally (user preference) display an image along with the channel content.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<ul>
+<li>required:
+<ul>
+<li><a href="#url">url</a></li>
+<li><a href="#link">link</a></li>
+<li><a href="#title">title</a></li>
+</ul>
+</li>
+<li>optional:
+<ul>
+<li><a href="#description">description</a></li>
+<li><a href="#width">width</a></li>
+<li><a href="#height">height</a></li>
+</ul>
+</li>
+</ul>  
+<h5>Examples</h5>
+<p class="example">
+&lt;image><br />
+&lt;url>http://my.site.com/images/1.gif&lt;/url><br />
+&lt;link>http://my.site.com/index.html&lt;/link><br />
+&lt;title>my image alt text&lt;/title><br />
+&lt;/image>
+</p>
+<p class="example">
+&lt;image><br />
+&lt;url>http://my.site.com/images/1.gif&lt;/url><br />
+&lt;link>http://my.site.com/index.html&lt;/link><br />
+&lt;title>my image alt text&lt;/title><br />
+&lt;width>120&lt;/width><br />
+&lt;height>200&lt;/height><br />
+&lt;/image>
+</p>
+
+<h4 id="item">&lt;item&gt;</h4>
+<h5>Description</h5>
+<p>An item that is associated with a <a href="#channel">channel</a>. The item should represent a web-page, or subsection within a web page. It should have a unique URL associated with it. Each item must contain a title and a link. A description is optional.</p>
+<h5>Netcenter Usage</h5>
+<p>generates a list of links. The description, if supplied, may optionally be viewed by the user as plain text beneath the link. Also, a maximum of 15 items per channel is enforced at this time.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<ul>
+<li>required:
+<ul>
+<li><a href="#title">title</a></li>
+<li><a href="#link">link</a></li>
+</ul>
+</li>
+<li>optional:
+<ul>
+<li><a href="#description">description</a></li>
+</ul>
+</li>
+</ul>  
+<h5>Examples</h5>
+<p class="example">
+&lt;item><br />
+&lt;title>Item #1&lt;/title><br />
+&lt;link>http://my.site.com/story1/index.html&lt;/link><br />
+&lt;/item>
+</p>
+<p class="example">
+&lt;item>
+&lt;title>Item #2&lt;/title><br />
+&lt;link>http://my.site.com/story2/index.html&lt;/link><br />
+&lt;description>Some stuff about this item&lt;/description><br />
+&lt;/item>
+</p>
+
+<h4 id="language">&lt;language&gt;</h4>
+<h5>Description</h5>
+<p>Specifies the language of a <a href="#channel">channel</a>. See <a href="#langcodes">supported language codes</a></p>
+<h5>Netcenter Usage</h5>
+<p>used to assist user with determining correct page encoding</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example1">example 1</a></p>
+
+<h4 id="lastBuildDate">&lt;lastBuildDate&gt;</h4>
+<h5>Description</h5>
+<p>The last time the channel was modified.</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example2">example 2</a></p>
+
+<h4 id="link">&lt;link&gt;</h4>
+<h5>Description</h5>
+<p>This is a url that a user is expected to click on, as opposed to a <a href="#url">&lt;url&gt;</a>
+that is for loading a resource, such as an image.</p>
+<h5>Netcenter Usage</h5>
+<p>must start with either "http://" or "ftp://". All other urls are considered invalid.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example1">examples</a></p>
+
+<h4 id="managingEditor">&lt;managingEditor&gt;</h4>
+<h5>Description</h5>
+<p>The email address of the managing editor of the site, the person to contact for editorial inquiries</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example2">example 2</a></p>
+
+<h4 id="name">&lt;name&gt;</h4>
+<h5>Description</h5>
+<p>The name of an object, corresponding to the "name" attribute of an HTML &lt;INPUT&gt; element. Currently, this only applies to <a href="#textinput">textinput</a>.</p>
+<h5>Netcenter Usage</h5>
+<p>generates "name" attribute in html form</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#textinput">textinput</a></p>
+
+<h4 id="pubDate">&lt;pubDate&gt;</h4>
+<h5>Description</h5>
+<p>Date when channel was published.</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example2">example 2</a></p>
+
+<h4 id="rating">&lt;rating&gt;</h4>
+<h5>Description</h5>
+<ul>
+<li>recommended links rating agencies:
+<ul>
+<li>http://www.w3.org/PICS/raters.htm (W3 maintained list of rating agency links)</li>
+<li>RSACi http://www.rsac.org (Click on 'register' link)</li>
+<li>SafeSurf http://www.safesurf.com/ http://www.safesurf.com/classify/index.html (direct)</li> 
+</ul>
+</li>
+<li>User actions:
+<ul>
+<li>Obtain a rating for your site from a well-known rating agency (eg RSACi, SafeSurf)</li>
+<li>Copy rating data into RSS file. Include only the data within the 'content=' attribute.</li>
+</ul>
+</li>
+<li>Expected format:
+<ul>
+<li>starts with "(PICS-1.1"</li>
+</ul>
+</li>
+</ul>
+<h5>Netcenter Usage</h5>
+<p>ignored. May use in the future to dynamically decide page rating.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>Tag obtained from rating agency:</p>
+<p class="example">
+&lt;META http-equiv="PICS-Label" content='(PICS-1.1 "http://www.classify.org/safesurf/" l r (SS~~000 1))'>
+</p>
+<p>RSS Rating tag:</p>
+<p class="example">
+&lt;rating>(PICS-1.1 "http://www.classify.org/safesurf/" l r (SS~~000 1))&lt;/rating>
+</p>
+
+<h4 id="rss">&lt;rss&gt;</h4>
+<h5>Description</h5>
+<p>Identifies begin and end of rss content.</p>
+<h5>Netcenter Usage</h5>
+<p>identifies content type</p>
+<h5>Attributes</h5>
+<ul>
+<li>required:
+<ul>
+<li>version (must be 0.91)</li>
+</ul>
+</li>
+</ul>  
+<h5>Sub-elements:</h5>
+<ul>
+<li>required:
+<ul>
+<li><a href="#channel">channel</a></li>
+</ul>
+</li>
+</ul>  
+<h5>Examples</h5>
+<p class="example">
+&lt;rss version="0.91"><br />
+&lt;channel><br />
+...<br />
+&lt;/channel><br />
+&lt;/rss>
+</p>
+
+<h4 id="skipDays">&lt;skipDays&gt;</h4>
+<h5>Description</h5>
+<p>A list of &lt;day&gt;s of the week, in English, indicating the days of the week when your channel will not be updated. As with activeHours, if you know your channel will never be updated on Saturday or Sunday, for example</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<ul>
+<li>required:
+<ul>
+<li><a href="#day">day</a></li>
+</ul>
+</li>
+</ul>  
+<h5>Examples</h5>
+<p class="example">
+&lt;skipDays><br />
+&lt;day>Saturday&lt;/day><br />
+&lt;day>Sunday&lt;/day><br />
+&lt;/skipDays>
+</p>
+
+<h4 id="skipHours">&lt;skipHours&gt;</h4>
+<h5>Description</h5>
+<p>A list of &lt;hour&gt;s indicating the hours in the day, GMT, when the channel is unlikely to be updated. If this sub-item is omitted, the channel is assumed to be updated hourly.</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<ul>
+<li>required:
+<ul>
+<li><a href="#hour">hour</a></li>
+</ul>
+</li>
+</ul>  
+<h5>Examples</h5>
+<p class="example">
+&lt;skipHours><br />
+&lt;hour>6&lt;/hour><br />
+&lt;hour>7&lt;/hour><br />
+&lt;hour>8&lt;/hour><br />
+&lt;hour>9&lt;/hour><br />
+&lt;hour>10&lt;/hour><br />
+&lt;hour>11&lt;/hour><br />
+&lt;/skipHours>
+</p>
+
+<h4 id="textinput">&lt;textinput&gt;</h4>
+<h5>Description</h5>
+<p>An input field for the purpose of allowing users to submit queries back
+to the publisher's site. This element should have a title, a link (to a cgi or other processor),
+a description containing some instructions, and a name, to be used as the name in
+the HTML tag &lt;input type=text name="[name]"&gt;</p>
+<h5>Netcenter Usage</h5>
+<p>Displays form for submission back to publisher.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<ul>
+<li>required:
+<ul>
+<li><a href="#title">title</a></li>
+<li><a href="#link">link</a></li>
+<li><a href="#description">description</a></li>
+<li><a href="#name">name</a></li>
+</ul>
+</li>
+</ul>  
+<h5>Examples</h5>
+<p class="example">
+&lt;textinput><br />
+&lt;title>Search Now!&lt;/title><br />
+&lt;description>Enter your search terms&lt;/description><br />
+&lt;name>find&lt;/name><br />
+&lt;link>http://my.site.com/search.cgi&lt;/link><br />
+&lt;/textinput>
+</p>
+
+<h4 id="title">&lt;title&gt;</h4>
+<h5>Description</h5>
+<p>An identifying string for a resource. When used in an item, this is the name of the item's
+link. When used in an image, this is the Alt text for the image. When used in
+a channel, this is the channel's title. When used in a textinput, this is the
+the textinput's title.</p>
+<h5>Netcenter Usage</h5>
+<p>displayed as appropriate depending on context.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example1">examples</a></p>
+
+<h4 id="url">&lt;url&gt;</h4>
+<h5>Description</h5>
+<p>Location to load a resource from. Note that this is slightly different from the <a href="#link">link</a>
+tag, which specifies where a user should be re-directed to if a resource is selected.</p>
+<h5>Netcenter Usage</h5>
+<p>must start with either "http://" or "ftp://". All other urls are considered invalid.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#image">image</a></p>
+
+<h4 id="webMaster">&lt;webMaster&gt;</h4>
+<h5>Description</h5>
+<p>The email address of the webmaster for the site, the person to contact if there are technical problems with the channel.</p>
+<h5>Netcenter Usage</h5>
+<p>ignored</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#example2">example 2</a></p>
+
+<h4 id="width">&lt;width&gt;</h4>
+<h5>Description</h5>
+<p>Specifies the width of an <a href="#image">image</a>. Should be an integer value.</p>
+<h5>Netcenter Usage</h5>
+<p>The value must be between 1 and 144. If omitted, the default value is 88.</p>
+<h5>Attributes</h5>
+<p>none</p>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Examples</h5>
+<p>See <a href="#image">image</a></p>
+
+<h4 id="xml">&lt;?xml?&gt;</h4>
+<h5>Description</h5>
+<p>Identifies this as an XML document and specifies encoding. See <a href="http://www.w3.org/TR/REC-xml">w3c</a>.
+Note that this must be on the first line of the document.</p>
+<h5>Netcenter Usage</h5>
+<p>required for XML compliance.</p>
+<h5>Attributes</h5>
+<ul>
+<li>version: must be "1.0"</li>
+<li>encoding: see <a href="#encodings">list</a></li>
+</ul>
+<h5>Sub-elements:</h5>
+<p>none</p>
+<h5>Example usage:</h5>
+<p class="example">
+&lt;?xml version="1.0"?>
+</p>
+<p class="example">
+&lt;?xml version="1.0" encoding="utf-8"?>
+</p>
+<p class="example">
+&lt;?xml version="1.0" encoding="Shift_JIS"?>
+</p>
+
+<h4 id="example1">Example 1 - Simple</h4>
+<p class="example">
+&lt;?xml version="1.0"?><br />
+&lt;!DOCTYPE rss SYSTEM "http://my.netscape.com/publish/formats/rss-0.91.dtd"><br />
+&lt;rss version="0.91"><br />
+&lt;channel><br />
+&lt;language>en&lt;/language><br />
+&lt;description>News and commentary from the cross-platform scripting community.&lt;/description><br />
+&lt;link>http://www.scripting.com/&lt;/link><br />
+&lt;title>Scripting News&lt;/title><br />
+&lt;image><br />
+&lt;link>http://www.scripting.com/&lt;/link><br />
+&lt;title>Scripting News&lt;/title><br />
+&lt;url>http://www.scripting.com/gifs/tinyScriptingNews.gif&lt;/url><br />
+&lt;/image><br />
+&lt;/channel><br />
+&lt;/rss>
+</p>
+
+<h4 id="example2">Example 2 - Complete</h4>
+<p class="example">
+&lt;?xml version="1.0"?><br />
+&lt;!DOCTYPE rss SYSTEM "http://my.netscape.com/publish/formats/rss-0.91.dtd"><br />
+&lt;rss version="0.91"><br />
+&lt;channel><br />
+&lt;copyright>Copyright 1997-1999 UserLand Software, Inc.&lt;/copyright><br />
+&lt;pubDate>Thu, 08 Jul 1999 07:00:00 GMT&lt;/pubDate><br />
+&lt;lastBuildDate>Thu, 08 Jul 1999 16:20:26 GMT&lt;/lastBuildDate><br />
+&lt;docs>http://my.userland.com/stories/storyReader$11&lt;/docs><br />
+&lt;description>News and commentary from the cross-platform scripting community.&lt;/description><br />
+&lt;link>http://www.scripting.com/&lt;/link><br />
+&lt;title>Scripting News&lt;/title><br />
+&lt;image><br />
+&lt;link>http://www.scripting.com/&lt;/link><br />
+&lt;title>Scripting News&lt;/title><br />
+&lt;url>http://www.scripting.com/gifs/tinyScriptingNews.gif&lt;/url><br />
+&lt;height>40&lt;/height><br />
+&lt;width>78&lt;/width><br />
+&lt;description>What is this used for?&lt;/description><br />
+&lt;/image><br />
+&lt;managingEditor>dave@userland.com (Dave Winer)&lt;/managingEditor><br />
+&lt;webMaster>dave@userland.com (Dave Winer)&lt;/webMaster><br />
+&lt;language>en-us&lt;/language><br />
+&lt;skipHours><br />
+&lt;hour>6&lt;/hour><br />
+&lt;hour>7&lt;/hour><br />
+&lt;hour>8&lt;/hour><br />
+&lt;hour>9&lt;/hour><br />
+&lt;hour>10&lt;/hour><br />
+&lt;hour>11&lt;/hour><br />
+&lt;/skipHours><br />
+&lt;skipDays><br />
+&lt;day>Sunday&lt;/day><br />
+&lt;/skipDays><br />
+&lt;rating>(PICS-1.1 "http://www.rsac.org/ratingsv01.html" l gen true comment "RSACi North America Server" for "http://www.rsac.org" on "1996.04.16T08:15-0500" r (n 0 s 0 v 0 l 0))&lt;/rating><br />
+&lt;item><br />
+&lt;title>stuff&lt;/title><br />
+&lt;link>http://bar&lt;/link><br />
+&lt;description>This is an article about some stuff&lt;/description><br />
+&lt;/item><br />
+&lt;textinput><br />
+&lt;title>Search Now!&lt;/title><br />
+&lt;description>Enter your search terms&lt;/description><br />
+&lt;name>find&lt;/name><br />
+&lt;link>http://my.site.com/search.cgi&lt;/link><br />
+&lt;/textinput><br />
+&lt;/channel><br />
+&lt;/rss>
+</p>
+
+<h4 id="example3">Example 3 - International</h4>
+<p class="example">
+&lt;?xml version="1.0" encoding="EuC-JP"?&gt;<br />
+<br />
+&lt;!DOCTYPE rss SYSTEM "http://my.netscape.com/publish/formats/rss-0.91.dtd"&gt;<br />
+&lt;rss version="0.91"&gt;<br />
+<br />
+&lt;channel&gt;<br />
+&lt;title&gt; ... &lt;/title&gt;<br />
+&lt;link&gt;http://www.mozilla.org&lt;/link&gt;<br />
+&lt;description&gt; ... &lt;/description&gt;<br />
+&lt;language&gt;ja&lt;/language&gt;  &lt;!-- tagged as Japanese content --&gt;<br />
+<br />
+&lt;item&gt;<br />
+&lt;title&gt; ... &lt;/title&gt;<br />
+&lt;link&gt;http://www.mozilla.org/status/&lt;/link&gt;<br />
+&lt;description&gt;This is an item description...&lt;/description&gt;<br />
+&lt;/item&gt;<br />
+<br />
+&lt;item&gt;<br />
+&lt;title&gt; ... &lt;/title&gt;<br />
+&lt;link&gt;http://www.mozilla.org/status/&lt;/link&gt;<br />
+&lt;description&gt;This is an item description...&lt;/description&gt;<br />
+&lt;/item&gt;<br />
+<br />
+&lt;item&gt;<br />
+&lt;title&gt; ... &lt;/title&gt;<br />
+&lt;link&gt;http://www.mozilla.org/status/&lt;/link&gt;<br />
+&lt;description&gt;This is an item description...&lt;/description&gt;<br />
+&lt;/item&gt;
+<br /> 
+&lt;item&gt;<br />
+&lt;title&gt; ... &lt;/title&gt;<br />
+&lt;link&gt;http://www.mozilla.org/status/&lt;/link&gt;<br />
+&lt;description&gt;This is an item description...&lt;/description&gt;<br />
+&lt;/item&gt;<br />
+<br />
+&lt;/channel&gt;<br />
+&lt;/rss&gt;</p>
+
+<h4 id="langcodes">Supported languages</h4>
+<h5>Why these?</h5>
+<p>These are the language codes that are accepted by Netcenter. Other language codes may be available <a href="http://www.w3.org/TR/REC-html40/struct/dirlang.html#langcodes">as specified</a> by the <a href="http://www.w3.org/">w3c</a>, but these are guaranteed to work with most browsers. Netcenter will currently reject other language codes, however other sites may accept them.</p>
+<h5>Codes</h5>
+<table border="0" width="35%" cellspacing="10">
+<tr valign="top"><td>af</td><td>Afrikaans</td></tr>
+<tr valign="top"><td>sq</td><td>Albanian</td></tr>
+<tr valign="top"><td>eu</td><td>Basque</td></tr>
+<tr valign="top"><td>be</td><td>Belarusian</td></tr>
+<tr valign="top"><td>bg</td><td>Bulgarian</td></tr>
+<tr valign="top"><td>ca</td><td>Catalan</td></tr>
+<tr valign="top"><td>zh-cn</td><td>Chinese (Simplified)</td></tr>
+<tr valign="top"><td>zh-tw</td><td>Chinese (Traditional)</td></tr>
+<tr valign="top"><td>hr</td><td>Croatian</td></tr>
+<tr valign="top"><td>cs</td><td>Czech</td></tr>
+<tr valign="top"><td>da</td><td>Danish</td></tr>
+<tr valign="top"><td>nl</td><td>Dutch</td></tr>
+<tr valign="top"><td>nl-be</td><td>Dutch (Belgium)</td></tr>
+<tr valign="top"><td>nl-nl</td><td>Dutch (Netherlands)</td></tr>
+<tr valign="top"><td>en</td><td>English</td></tr>
+<tr valign="top"><td>en-au</td><td>English (Australia)</td></tr>
+<tr valign="top"><td>en-bz</td><td>English (Belize)</td></tr>
+<tr valign="top"><td>en-ca</td><td>English (Canada)</td></tr>
+<tr valign="top"><td>en-ie</td><td>English (Ireland)</td></tr>
+<tr valign="top"><td>en-jm</td><td>English (Jamaica)</td></tr>
+<tr valign="top"><td>en-nz</td><td>English (New Zealand)</td></tr>
+<tr valign="top"><td>en-ph</td><td>English (Phillipines)</td></tr>
+<tr valign="top"><td>en-za</td><td>English (South Africa)</td></tr>
+<tr valign="top"><td>en-tt</td><td>English (Trinidad)</td></tr>
+<tr valign="top"><td>en-gb</td><td>English (United Kingdom)</td></tr>
+<tr valign="top"><td>en-us</td><td>English (United States)</td></tr>
+<tr valign="top"><td>en-zw</td><td>English (Zimbabwe)</td></tr>
+<tr valign="top"><td>fo</td><td>Faeroese</td></tr>
+<tr valign="top"><td>fi</td><td>Finnish</td></tr>
+<tr valign="top"><td>fr</td><td>French</td></tr>
+<tr valign="top"><td>fr-be</td><td>French (Belgium)</td></tr>
+<tr valign="top"><td>fr-ca</td><td>French (Canada)</td></tr>
+<tr valign="top"><td>fr-fr</td><td>French (France)</td></tr>
+<tr valign="top"><td>fr-lu</td><td>French (Luxembourg)</td></tr>
+<tr valign="top"><td>fr-mc</td><td>French (Monaco)</td></tr>
+<tr valign="top"><td>fr-ch</td><td>French (Switzerland)</td></tr>
+<tr valign="top"><td>gl</td><td>Galician</td></tr>
+<tr valign="top"><td>gd</td><td>Gaelic</td></tr>
+<tr valign="top"><td>de</td><td>German</td></tr>
+<tr valign="top"><td>de-at</td><td>German (Austria)</td></tr>
+<tr valign="top"><td>de-de</td><td>German (Germany)</td></tr>
+<tr valign="top"><td>de-li</td><td>German (Liechtenstein)</td></tr>
+<tr valign="top"><td>de-lu</td><td>German (Luxembourg)</td></tr>
+<tr valign="top"><td>de-ch</td><td>German (Switzerland)</td></tr>
+<tr valign="top"><td>el</td><td>Greek</td></tr>
+<tr valign="top"><td>hu</td><td>Hungarian</td></tr>
+<tr valign="top"><td>is</td><td>Icelandic</td></tr>
+<tr valign="top"><td>id</td><td>Indonesian</td></tr>
+<tr valign="top"><td>ga</td><td>Irish</td></tr>
+<tr valign="top"><td>it</td><td>Italian</td></tr>
+<tr valign="top"><td>it-it</td><td>Italian (Italy)</td></tr>
+<tr valign="top"><td>it-ch</td><td>Italian (Switzerland)</td></tr>
+<tr valign="top"><td>ja</td><td>Japanese</td></tr>
+<tr valign="top"><td>ko</td><td>Korean</td></tr>
+<tr valign="top"><td>mk</td><td>Macedonian</td></tr>
+<tr valign="top"><td>no</td><td>Norwegian</td></tr>
+<tr valign="top"><td>pl</td><td>Polish</td></tr>
+<tr valign="top"><td>pt</td><td>Portuguese</td></tr>
+<tr valign="top"><td>pt-br</td><td>Portuguese (Brazil)</td></tr>
+<tr valign="top"><td>pt-pt</td><td>Portuguese (Portugal)</td></tr>
+<tr valign="top"><td>ro</td><td>Romanian</td></tr>
+<tr valign="top"><td>ro-mo</td><td>Romanian (Moldova)</td></tr>
+<tr valign="top"><td>ro-ro</td><td>Romanian (Romania)</td></tr>
+<tr valign="top"><td>ru</td><td>Russian</td></tr>
+<tr valign="top"><td>ru-mo</td><td>Russian (Moldova)</td></tr>
+<tr valign="top"><td>ru-ru</td><td>Russian (Russia)</td></tr>
+<tr valign="top"><td>sr</td><td>Serbian</td></tr>
+<tr valign="top"><td>sk</td><td>Slovak</td></tr>
+<tr valign="top"><td>sl</td><td>Slovenian</td></tr>
+<tr valign="top"><td>es</td><td>Spanish</td></tr>
+<tr valign="top"><td>es-ar</td><td>Spanish (Argentina)</td></tr>
+<tr valign="top"><td>es-bo</td><td>Spanish (Bolivia)</td></tr>
+<tr valign="top"><td>es-cl</td><td>Spanish (Chile)</td></tr>
+<tr valign="top"><td>es-co</td><td>Spanish (Colombia)</td></tr>
+<tr valign="top"><td>es-cr</td><td>Spanish (Costa Rica)</td></tr>
+<tr valign="top"><td>es-do</td><td>Spanish (Dominican Republic)</td></tr>
+<tr valign="top"><td>es-ec</td><td>Spanish (Ecuador)</td></tr>
+<tr valign="top"><td>es-sv</td><td>Spanish (El Salvador)</td></tr>
+<tr valign="top"><td>es-gt</td><td>Spanish (Guatemala)</td></tr>
+<tr valign="top"><td>es-hn</td><td>Spanish (Honduras)</td></tr>
+<tr valign="top"><td>es-mx</td><td>Spanish (Mexico)</td></tr>
+<tr valign="top"><td>es-ni</td><td>Spanish (Nicaragua)</td></tr>
+<tr valign="top"><td>es-pa</td><td>Spanish (Panama)</td></tr>
+<tr valign="top"><td>es-py</td><td>Spanish (Paraguay)</td></tr>
+<tr valign="top"><td>es-pe</td><td>Spanish (Peru)</td></tr>
+<tr valign="top"><td>es-pr</td><td>Spanish (Puerto Rico)</td></tr>
+<tr valign="top"><td>es-es</td><td>Spanish (Spain)</td></tr>
+<tr valign="top"><td>es-uy</td><td>Spanish (Uruguay)</td></tr>
+<tr valign="top"><td>es-ve</td><td>Spanish (Venezuela)</td></tr>
+<tr valign="top"><td>sv</td><td>Swedish</td></tr>
+<tr valign="top"><td>sv-fi</td><td>Swedish (Finland)</td></tr>
+<tr valign="top"><td>sv-se</td><td>Swedish (Sweden)</td></tr>
+<tr valign="top"><td>tr</td><td>Turkish</td></tr>
+<tr valign="top"><td>uk</td><td>Ukranian</td></tr>
+</table>
+
+<h4 id="encodings">Supported encodings</h4>
+<p>Note: these are <b>not</b> case sensitive</p>
+<table border="0" width="65%" cellspacing="10">
+<tr valign="top"><td><b>IANA standard name</b></td><td><b>MIME&nbsp;preferred&nbsp;name&nbsp;(if&nbsp;different&nbsp;from&nbsp;IANA)</b></td></tr>
+<tr valign="top"><td>ANSI_X3.4-1968</td><td>US-ASCII</td></tr>
+<tr valign="top"><td>ISO_8859-1:1987</td><td>ISO-8859-1</td></tr>
+<tr valign="top"><td>ISO_8859-2:1987</td><td>ISO-8859-2</td></tr>
+<tr valign="top"><td>ISO_8859-5:1988</td><td>ISO-8859-5</td></tr>
+<tr valign="top"><td>ISO_8859-7:1987</td><td>ISO-8859-7</td></tr>
+<tr valign="top"><td>ISO_8859-9:1989</td><td>ISO-8859-9</td></tr>
+<tr valign="top"><td>Shift_JIS</td></tr>
+<tr valign="top"><td>Extended_UNIX_Code_Packed_Format_for_Japanese</td><td>EUC-JP</td></tr>
+<tr valign="top"><td>GB2312</td></tr>
+<tr valign="top"><td>EUC-KR</td></tr>
+<tr valign="top"><td>Big5</td></tr>
+<tr valign="top"><td>windows-1250</td></tr>
+<tr valign="top"><td>windows-1251</td></tr>
+<tr valign="top"><td>UTF-8</td></tr>
+<tr valign="top"><td>x-mac-roman</td></tr>
+</table>
+
+<h4 id="dtd"><a href="#dtd">DTD</a></h4>
+<h5>Location</h5>
+<p>Public ID: -//Netscape Communications//DTD RSS 0.91//EN</p>
+<p>System ID: <a href="http://my.netscape.com/publish/formats/rss-0.91.dtd">http://my.netscape.com/publish/formats/rss-0.91.dtd</a></p>
+<h5>The DTD itself</h5>
+<p class="example">
+&lt;!--<br />
+Rich Site Summary (RSS) 0.91 official DTD, proposed.<br />
+RSS is an XML vocabulary for describing<br />
+metadata about websites, and enabling the display of<br />
+"channels" on the "My Netscape" website.<br />
+RSS Info can be found at http://my.netscape.com/publish/<br />
+XML Info can be found at http://www.w3.org/XML/ <br />
+copyright Netscape Communications, 1999<br />
+Dan Libby - danda@netscape.com<br />
+Based on RSS DTD originally created by<br />
+Lars Marius Garshol - larsga@ifi.uio.no.<br />
+: rss-spec-0.91.html,v 1.1.2.2 2001/11/09 08:10:07 dprusak Exp $<br />
+--><br />
+&lt;!ELEMENT rss (channel)><br />
+&lt;!ATTLIST rss<br />
+version     CDATA #REQUIRED> &lt;!-- must be "0.91"> --><br />
+&lt;!ELEMENT channel (title | description | link | language | item+ | rating? | image? | textinput? | copyright? | pubDate? | lastBuildDate? | docs? | managingEditor? | webMaster? | skipHours? | skipDays?)*><br />
+&lt;!ELEMENT title (#PCDATA)><br />
+&lt;!ELEMENT description (#PCDATA)><br />
+&lt;!ELEMENT link (#PCDATA)><br />
+&lt;!ELEMENT image (title | url | link | width? | height? | description?)*><br />
+&lt;!ELEMENT url (#PCDATA)><br />
+&lt;!ELEMENT item (title | link | description)*><br />
+&lt;!ELEMENT textinput (title | description | name | link)*><br />
+&lt;!ELEMENT name (#PCDATA)><br />
+&lt;!ELEMENT rating (#PCDATA)><br />
+&lt;!ELEMENT language (#PCDATA)><br />
+&lt;!ELEMENT width (#PCDATA)><br />
+&lt;!ELEMENT height (#PCDATA)><br />
+&lt;!ELEMENT copyright (#PCDATA)><br />
+&lt;!ELEMENT pubDate (#PCDATA)><br />
+&lt;!ELEMENT lastBuildDate (#PCDATA)><br />
+&lt;!ELEMENT docs (#PCDATA)><br />
+&lt;!ELEMENT managingEditor (#PCDATA)><br />
+&lt;!ELEMENT webMaster (#PCDATA)><br />
+&lt;!ELEMENT hour (#PCDATA)><br />
+&lt;!ELEMENT day (#PCDATA)><br />
+&lt;!ELEMENT skipHours (hour+)><br />
+&lt;!ELEMENT skipDays (day+)><br />
+&lt;!--<br />
+Copied from HTML 3.2 DTD, with modifications (removed CDATA)<br />
+http://www.w3.org/TR/REC-html32.html#dtd<br />
+=============== BEGIN ===================<br />
+--><br />
+&lt;!-- <br />
+Character Entities for ISO Latin-1<br />
+(C) International Organization for Standardization 1986<br />
+Permission to copy in any form is granted for use with<br />
+conforming SGML systems and applications as defined in<br />
+ISO 8879, provided this notice is included in all copies.<br />
+This has been extended for use with HTML to cover the full<br />
+set of codes in the range 160-255 decimal.<br />
+--><br />
+&lt;!-- Character entity set. Typical invocation:<br />
+&lt;!ENTITY % ISOlat1 PUBLIC<br />
+"ISO 8879-1986//ENTITIES Added Latin 1//EN//HTML"><br />
+%ISOlat1;<br />
+--><br />
+&lt;!ENTITY nbsp   "&#160;"> &lt;!-- no-break space --><br />
+&lt;!ENTITY iexcl  "&#161;"> &lt;!-- inverted exclamation mark --><br />
+&lt;!ENTITY cent   "&#162;"> &lt;!-- cent sign --><br />
+&lt;!ENTITY pound  "&#163;"> &lt;!-- pound sterling sign --><br />
+&lt;!ENTITY curren "&#164;"> &lt;!-- general currency sign --><br />
+&lt;!ENTITY yen    "&#165;"> &lt;!-- yen sign --><br />
+&lt;!ENTITY brvbar "&#166;"> &lt;!-- broken (vertical) bar --><br />
+&lt;!ENTITY sect   "&#167;"> &lt;!-- section sign --><br />
+&lt;!ENTITY uml    "&#168;"> &lt;!-- umlaut (dieresis) --><br />
+&lt;!ENTITY copy   "&#169;"> &lt;!-- copyright sign --><br />
+&lt;!ENTITY ordf   "&#170;"> &lt;!-- ordinal indicator, feminine --><br />
+&lt;!ENTITY laquo  "&#171;"> &lt;!-- angle quotation mark, left --><br />
+&lt;!ENTITY not    "&#172;"> &lt;!-- not sign --><br />
+&lt;!ENTITY shy    "&#173;"> &lt;!-- soft hyphen --><br />
+&lt;!ENTITY reg    "&#174;"> &lt;!-- registered sign --><br />
+&lt;!ENTITY macr   "&#175;"> &lt;!-- macron --><br />
+&lt;!ENTITY deg    "&#176;"> &lt;!-- degree sign --><br />
+&lt;!ENTITY plusmn "&#177;"> &lt;!-- plus-or-minus sign --><br />
+&lt;!ENTITY sup2   "&#178;"> &lt;!-- superscript two --><br />
+&lt;!ENTITY sup3   "&#179;"> &lt;!-- superscript three --><br />
+&lt;!ENTITY acute  "&#180;"> &lt;!-- acute accent --><br />
+&lt;!ENTITY micro  "&#181;"> &lt;!-- micro sign --><br />
+&lt;!ENTITY para   "&#182;"> &lt;!-- pilcrow (paragraph sign) --><br />
+&lt;!ENTITY middot "&#183;"> &lt;!-- middle dot --><br />
+&lt;!ENTITY cedil  "&#184;"> &lt;!-- cedilla --><br />
+&lt;!ENTITY sup1   "&#185;"> &lt;!-- superscript one --><br />
+&lt;!ENTITY ordm   "&#186;"> &lt;!-- ordinal indicator, masculine --><br />
+&lt;!ENTITY raquo  "&#187;"> &lt;!-- angle quotation mark, right --><br />
+&lt;!ENTITY frac14 "&#188;"> &lt;!-- fraction one-quarter --><br />
+&lt;!ENTITY frac12 "&#189;"> &lt;!-- fraction one-half --><br />
+&lt;!ENTITY frac34 "&#190;"> &lt;!-- fraction three-quarters --><br />
+&lt;!ENTITY iquest "&#191;"> &lt;!-- inverted question mark --><br />
+&lt;!ENTITY Agrave "&#192;"> &lt;!-- capital A, grave accent --><br />
+&lt;!ENTITY Aacute "&#193;"> &lt;!-- capital A, acute accent --><br />
+&lt;!ENTITY Acirc  "&#194;"> &lt;!-- capital A, circumflex accent --><br />
+&lt;!ENTITY Atilde "&#195;"> &lt;!-- capital A, tilde --><br />
+&lt;!ENTITY Auml   "&#196;"> &lt;!-- capital A, dieresis or umlaut mark --><br />
+&lt;!ENTITY Aring  "&#197;"> &lt;!-- capital A, ring --><br />
+&lt;!ENTITY AElig  "&#198;"> &lt;!-- capital AE diphthong (ligature) --><br />
+&lt;!ENTITY Ccedil "&#199;"> &lt;!-- capital C, cedilla --><br />
+&lt;!ENTITY Egrave "&#200;"> &lt;!-- capital E, grave accent --><br />
+&lt;!ENTITY Eacute "&#201;"> &lt;!-- capital E, acute accent --><br />
+&lt;!ENTITY Ecirc  "&#202;"> &lt;!-- capital E, circumflex accent --><br />
+&lt;!ENTITY Euml   "&#203;"> &lt;!-- capital E, dieresis or umlaut mark --><br />
+&lt;!ENTITY Igrave "&#204;"> &lt;!-- capital I, grave accent --><br />
+&lt;!ENTITY Iacute "&#205;"> &lt;!-- capital I, acute accent --><br />
+&lt;!ENTITY Icirc  "&#206;"> &lt;!-- capital I, circumflex accent --><br />
+&lt;!ENTITY Iuml   "&#207;"> &lt;!-- capital I, dieresis or umlaut mark --><br />
+&lt;!ENTITY ETH    "&#208;"> &lt;!-- capital Eth, Icelandic --><br />
+&lt;!ENTITY Ntilde "&#209;"> &lt;!-- capital N, tilde --><br />
+&lt;!ENTITY Ograve "&#210;"> &lt;!-- capital O, grave accent --><br />
+&lt;!ENTITY Oacute "&#211;"> &lt;!-- capital O, acute accent --><br />
+&lt;!ENTITY Ocirc  "&#212;"> &lt;!-- capital O, circumflex accent --><br />
+&lt;!ENTITY Otilde "&#213;"> &lt;!-- capital O, tilde --><br />
+&lt;!ENTITY Ouml   "&#214;"> &lt;!-- capital O, dieresis or umlaut mark --><br />
+&lt;!ENTITY times  "&#215;"> &lt;!-- multiply sign --><br />
+&lt;!ENTITY Oslash "&#216;"> &lt;!-- capital O, slash --><br />
+&lt;!ENTITY Ugrave "&#217;"> &lt;!-- capital U, grave accent --><br />
+&lt;!ENTITY Uacute "&#218;"> &lt;!-- capital U, acute accent --><br />
+&lt;!ENTITY Ucirc  "&#219;"> &lt;!-- capital U, circumflex accent --><br />
+&lt;!ENTITY Uuml   "&#220;"> &lt;!-- capital U, dieresis or umlaut mark --><br />
+&lt;!ENTITY Yacute "&#221;"> &lt;!-- capital Y, acute accent --><br />
+&lt;!ENTITY THORN  "&#222;"> &lt;!-- capital THORN, Icelandic --><br />
+&lt;!ENTITY szlig  "&#223;"> &lt;!-- small sharp s, German (sz ligature) --><br />
+&lt;!ENTITY agrave "&#224;"> &lt;!-- small a, grave accent --><br />
+&lt;!ENTITY aacute "&#225;"> &lt;!-- small a, acute accent --><br />
+&lt;!ENTITY acirc  "&#226;"> &lt;!-- small a, circumflex accent --><br />
+&lt;!ENTITY atilde "&#227;"> &lt;!-- small a, tilde --><br />
+&lt;!ENTITY auml   "&#228;"> &lt;!-- small a, dieresis or umlaut mark --><br />
+&lt;!ENTITY aring  "&#229;"> &lt;!-- small a, ring --><br />
+&lt;!ENTITY aelig  "&#230;"> &lt;!-- small ae diphthong (ligature) --><br />
+&lt;!ENTITY ccedil "&#231;"> &lt;!-- small c, cedilla --><br />
+&lt;!ENTITY egrave "&#232;"> &lt;!-- small e, grave accent --><br />
+&lt;!ENTITY eacute "&#233;"> &lt;!-- small e, acute accent --><br />
+&lt;!ENTITY ecirc  "&#234;"> &lt;!-- small e, circumflex accent --><br />
+&lt;!ENTITY euml   "&#235;"> &lt;!-- small e, dieresis or umlaut mark --><br />
+&lt;!ENTITY igrave "&#236;"> &lt;!-- small i, grave accent --><br />
+&lt;!ENTITY iacute "&#237;"> &lt;!-- small i, acute accent --><br />
+&lt;!ENTITY icirc  "&#238;"> &lt;!-- small i, circumflex accent --><br />
+&lt;!ENTITY iuml   "&#239;"> &lt;!-- small i, dieresis or umlaut mark --><br />
+&lt;!ENTITY eth    "&#240;"> &lt;!-- small eth, Icelandic --><br />
+&lt;!ENTITY ntilde "&#241;"> &lt;!-- small n, tilde --><br />
+&lt;!ENTITY ograve "&#242;"> &lt;!-- small o, grave accent --><br />
+&lt;!ENTITY oacute "&#243;"> &lt;!-- small o, acute accent --><br />
+&lt;!ENTITY ocirc  "&#244;"> &lt;!-- small o, circumflex accent --><br />
+&lt;!ENTITY otilde "&#245;"> &lt;!-- small o, tilde --><br />
+&lt;!ENTITY ouml   "&#246;"> &lt;!-- small o, dieresis or umlaut mark --><br />
+&lt;!ENTITY divide "&#247;"> &lt;!-- divide sign --><br />
+&lt;!ENTITY oslash "&#248;"> &lt;!-- small o, slash --><br />
+&lt;!ENTITY ugrave "&#249;"> &lt;!-- small u, grave accent --><br />
+&lt;!ENTITY uacute "&#250;"> &lt;!-- small u, acute accent --><br />
+&lt;!ENTITY ucirc  "&#251;"> &lt;!-- small u, circumflex accent --><br />
+&lt;!ENTITY uuml   "&#252;"> &lt;!-- small u, dieresis or umlaut mark --><br />
+&lt;!ENTITY yacute "&#253;"> &lt;!-- small y, acute accent --><br />
+&lt;!ENTITY thorn  "&#254;"> &lt;!-- small thorn, Icelandic --><br />
+&lt;!ENTITY yuml   "&#255;"> &lt;!-- small y, dieresis or umlaut mark --><br />
+&lt;!--<br />
+Copied from HTML 3.2 DTD, with modifications (removed CDATA)<br />
+http://www.w3.org/TR/REC-html32.html#dtd<br />
+================= END ===================<br />
+-->
+</p>
+
+<h4>Proprietary Schema (Validation Rules)</h4>
+<h5>Explanation</h5>
+<p>XML currently provides a limited amount of validation via DTD's. However, DTD's do not provide any support for common validation requirements, such as data types, length of strings, number of sub-elements, or pattern matching.</p>
+
+<p>A standard has been proposed to solve this problem. XML Schemas looks like it will do all of this and more. Unfortunately, there are few, if any parsers available today that understand them.</p>
+
+<p>As a proprietary, <em>interim only solution</em>, we have developed a very simplistic schema format that performs a second level of validation after the parser has read the XML document into memory.  We are listing the schema used to validate RSS 0.91 files, so that there will be no ambiguity when validation fails.</p>
+
+<p>Here are the basic rules:</p>
+<ul>
+<li>Each XML element must be defined by an &lt;Element&gt; tag.
+<ul>
+<li>Each Element definition must have a unique id attribute and a type attribute.</li>
+<li>Each Attribute of an Element must be referenced by an &lt;Attrib&gt; tag</li>
+<li>Each sub-Element of an Element of type container must be referenced by &lt;Contains&gt; tag.</li>
+<li>Each Element may have a type associated with it.  Currently supported types are:
+<ul>
+<li>container: this Element contains other Elements only.</li>
+<li>string: this Element contains text data.</li>
+<li>int: this Element contains an integer.</li>
+</ul>
+</li>
+<li>Each string or int Element may contain a matching rule, specified via &lt;Matches&gt;</li>
+<li>Each string or int Element may specify a minimum and maximum number of characters (or value if type int) via min, max, and exactly.</li>
+</ul>
+</li>
+<li>Each XML attribute must be defined by an &lt;Attribute&gt; tag.
+<ul>
+<li>Each Attribute definition must have a unique id attribute and a type attribute.</li>
+<li>Each Attribute may be of type string or int.</li>
+<li>Each Attribute may contain a matching rule, specified via &lt;Matches&gt;</li>
+<li>Each Attribute may specify a minimum and maximum number of characters (or value if type int) via min, max, and exactly.</li>
+</ul>
+</li>
+<li>Each &lt;Contains&gt; and &lt;Attrib&gt; definition must contain a 'ref' attribute that refers to a uniquely defined Element or Attribute with the value of 'ref' as its id.</li>
+<li>Each &lt;Contains&gt; and &lt;Attrib&gt; definition may contain min, max, or exactly attributes to define the number of Elements or Attributes required.</li>
+<li>Each &lt;Matches&gt; must contain a valid regular expression, against which the
+corresponding Element or Attribute will be evaluated.</li>
+</ul>
+
+<h4>Schema</h4>
+<p>Here is the schema for RSS 0.91.</p>
+<p class="example">
+&lt;?xml version="1.0"?><br />
+&lt;!DOCTYPE Schema PUBLIC "-//Netscape Communications//DTD Schema 1.0//EN" "http://my.netscape.com/publish/formats/schema-1.0.dtd"><br />
+&lt;Schema version="DKHXVF 1.0" root="rss" name="RSS 0.91"><br />
+&lt;Element id="rss" type="container"><br />
+&lt;Contains ref="channel" exactly="1"/><br />
+&lt;Attrib ref="version" exactly="1"/><br />
+&lt;/Element><br />
+&lt;Attribute id="version" type="string"><br />
+&lt;Matches>0.91&lt;/Matches><br />
+&lt;/Attribute><br />
+&lt;Element id="channel" type="container"><br />
+&lt;Contains ref="description" exactly="1"/><br />
+&lt;Contains ref="image" min="0" max="1"/><br />
+&lt;Contains ref="item" min="0" max="15"/><br />
+&lt;Contains ref="language" exactly="1"/><br />
+&lt;Contains ref="link" exactly="1"/><br />
+&lt;Contains ref="rating" min="0" max="1"/><br />
+&lt;Contains ref="textinput" min="0" max="1"/><br />
+&lt;Contains ref="title" exactly="1"/><br />
+&lt;Contains ref="copyright" min="0" max="1"/><br />
+&lt;Contains ref="pubDate" min="0" max="1"/><br />
+&lt;Contains ref="lastBuildDate" min="0" max="1"/><br />
+&lt;Contains ref="docs" min="0" max="1"/><br />
+&lt;Contains ref="managingEditor" min="0" max="1"/><br />
+&lt;Contains ref="webMaster" min="0" max="1"/><br />
+&lt;Contains ref="skipHours" min="0" max="1"/><br />
+&lt;Contains ref="skipDays" min="0" max="1"/><br />
+&lt;/Element><br />
+&lt;Element id="copyright" type="string" max="100"/><br />
+&lt;Element id="pubDate" type="string" max="100"/><br />
+&lt;Element id="lastBuildDate" type="string" max="100"/><br />
+&lt;Element id="docs" type="string" max="500"/><br />
+&lt;Element id="managingEditor" type="string" max="100"/><br />
+&lt;Element id="webMaster" type="string" max="100"/><br />
+&lt;Element id="skipHours" type="container"><br />
+&lt;Contains ref="hour" min="0" max="24"/><br />
+&lt;/Element><br />
+&lt;Element id="skipDays" type="container"><br />
+&lt;Contains ref="day" min="0" max="7"/><br />
+&lt;/Element><br />
+&lt;Element id="hour" type="int" min="0" max="24"/><br />
+&lt;Element id="day" type="string" min="0" max="10"/><br />
+&lt;Element id="item" type="container"><br />
+&lt;Contains ref="title" exactly="1"/><br />
+&lt;Contains ref="link" exactly="1"/><br />
+&lt;Contains ref="description" min="0" max="1"/><br />
+&lt;/Element><br />
+&lt;Element id="image" type="container"><br />
+&lt;Contains ref="title" exactly="1"/><br />
+&lt;Contains ref="link" min="0" max="1" /><br />
+&lt;Contains ref="url" exactly="1"/><br />
+&lt;Contains ref="width" min="0" max="1"/><br />
+&lt;Contains ref="height" min="0" max="1"/><br />
+&lt;Contains ref="description" min="0" max="1"/><br />
+&lt;/Element><br />
+&lt;Element id="textinput" type="container"><br />
+&lt;Contains ref="title" exactly="1"/><br />
+&lt;Contains ref="link" exactly="1"/><br />
+&lt;Contains ref="description" exactly="1"/><br />
+&lt;Contains ref="name" exactly="1"/><br />
+&lt;/Element><br />
+&lt;Element id="title" type="string" min="1" max="100"/><br />
+&lt;Element id="description" type="string" min="1" max="500"/><br />
+&lt;Element id="url" type="string" min="1" max="500"><br />
+&lt;Matches>^(http://|^ftp://)&lt;/Matches><br />
+&lt;/Element><br />
+&lt;Element id="link" type="string" min="1" max="500"><br />
+&lt;Matches>^(http://|^ftp://)&lt;/Matches><br />
+&lt;/Element><br />
+&lt;Element id="language" type="string" min="2" max="5"><br />
+&lt;Matches><br />
+^(af |      # Afrikaans<br />
+sq |        # Albanian<br />
+eu |        # Basque<br />
+be |        # Belarusian<br />
+bg |        # Bulgarian<br />
+ca |        # Catalan<br />
+zh-cn |     # Chinese (Simplified)<br />
+zh-tw |     # Chinese (Traditional)<br />
+hr |        # Croatian<br />
+cs |        # Czech<br />
+da |        # Danish<br />
+nl |        # Dutch<br />
+nl-be |     # Dutch (Belgium)<br />
+nl-nl |     # Dutch (Netherlands)<br />
+en |        # English<br />
+en-au |     # English (Australia)<br />
+en-bz |     # English (Belize)<br />
+en-ca |     # English (Canada)<br />
+en-ie |     # English (Ireland)<br />
+en-jm |     # English (Jamaica)<br />
+en-nz |     # English (New Zealand)<br />
+en-ph |     # English (Phillipines)<br />
+en-za |     # English (South Africa)<br />
+en-tt |     # English (Trinidad)<br />
+en-gb |     # English (United Kingdom)<br />
+en-us |     # English (United States)<br />
+en-zw |     # English (Zimbabwe)<br />
+fo |        # Faeroese<br />
+fi |        # Finnish<br />
+fr |        # French<br />
+fr-be |     # French (Belgium)<br />
+fr-ca |     # French (Canada)<br />
+fr-fr |     # French (France)<br />
+fr-lu |     # French (Luxembourg)<br />
+fr-mc |     # French (Monaco)<br />
+fr-ch |     # French (Switzerland)<br />
+gl |        # Galician<br />
+gd |        # Gaelic<br />
+de |        # German<br />
+de-at |     # German (Austria)<br />
+de-de |     # German (Germany)<br />
+de-li |     # German (Liechtenstein)<br />
+de-lu |     # German (Luxembourg)<br />
+de-ch |     # German (Switzerland)<br />
+el |        # Greek<br />
+hu |        # Hungarian<br />
+is |        # Icelandic<br />
+id |        # Indonesian<br />
+ga |        # Irish<br />
+it |        # Italian<br />
+it-it |     # Italian (Italy)<br />
+it-ch |     # Italian (Switzerland)<br />
+ja |        # Japanese<br />
+ko |        # Korean<br />
+mk |        # Macedonian<br />
+no |        # Norwegian<br />
+pl |        # Polish<br />
+pt |        # Portuguese<br />
+pt-br |     # Portuguese (Brazil)<br />
+pt-pt |     # Portuguese (Portugal)<br />
+ro |        # Romanian<br />
+ro-mo |     # Romanian (Moldova)<br />
+ro-ro |     # Romanian (Romania)<br />
+ru |        # Russian<br />
+ru-mo |     # Russian (Moldova)<br />
+ru-ru |     # Russian (Russia)<br />
+sr |        # Serbian<br />
+sk |        # Slovak<br />
+sl |        # Slovenian<br />
+es |        # Spanish<br />
+es-ar |     # Spanish (Argentina)<br />
+es-bo |     # Spanish (Bolivia)<br />
+es-cl |     # Spanish (Chile)<br />
+es-co |     # Spanish (Colombia)<br />
+es-cr |     # Spanish (Costa Rica)<br />
+es-do |     # Spanish (Dominican Republic)<br />
+es-ec |     # Spanish (Ecuador)<br />
+es-sv |     # Spanish (El Salvador)<br />
+es-gt |     # Spanish (Guatemala)<br />
+es-hn |     # Spanish (Honduras)<br />
+es-mx |     # Spanish (Mexico)<br />
+es-ni |     # Spanish (Nicaragua)<br />
+es-pa |     # Spanish (Panama)<br />
+es-py |     # Spanish (Paraguay)<br />
+es-pe |     # Spanish (Peru)<br />
+es-pr |     # Spanish (Puerto Rico)<br />
+es-es |     # Spanish (Spain)<br />
+es-uy |     # Spanish (Uruguay)<br />
+es-ve |     # Spanish (Venezuela)<br />
+sv |        # Swedish<br />
+sv-fi |     # Swedish (Finland)<br />
+sv-se |     # Swedish (Sweden)<br />
+tr |        # Turkish<br />
+uk          # Ukranian<br />
+)$<br />
+&lt;/Matches><br />
+&lt;/Element><br />
+&lt;Element id="rating" type="string" min="20" max="500"><br />
+&lt;Matches>^\(PICS-1.1&lt;/Matches><br />
+&lt;/Element><br />
+&lt;Element id="width" type="int" min="1" max="144"/><br />
+&lt;Element id="height" type="int" min="1" max="400"/><br />
+&lt;Element id="name" type="string" min="1" max="20"/><br />
+&lt;/Schema>
+</p>
+
+<h4>Schema DTD</h4>
+<p>Here is the DTD for the schema format.</p>
+<p class="example">
+&lt;!--<br />
+A DTD for Dan's Kinda Hacky XML Validation Format (DKHXVF)<br />
+Basically, this format allows us to enforce some additional rules<br />
+that DTD's do not.  Specifically, we can:<br />
+- specify min and max for number of each child element<br />
+- specify a regular expression that text elements and attributes must match<br />
+- specify type of text elements and attributes (int, float, string, timestamp)<br />
+- specify min and max for any type.  (length compare for strings, numeric otherwise)<br />
+The hope is that this will allow the rapid creation of new formats, and modification<br />
+of existing formats (adding/removing tags, attributes etc), without requiring<br />
+code changes in the validation software.<br />
+This is not in any way intended to be an alternative to XML schemas.  In the<br />
+absence of code supporting XML schemas, I created this, but it is meant as<br />
+a transitional work only.<br />
+For more on XML schemas, see:<br />
+http://www.w3.org/1999/05/06-xmlschema-1/ and<br />
+http://www.w3.org/1999/05/06-xmlschema-2/<br />
+This is also not meant to replace DTDs.  There are many things that you can do<br />
+with DTDs that you cannot do with this format.  For example, you cannot declare<br />
+entities with this format.  You must do that in the DTD.  If you want your<br />
+parser to interpret them correctly, you must use a validating parser.<br />
+It is possible to use these schemas without DTD validation, however you may run<br />
+into problems with entity expansion and other things.<br />
+Dan Libby - danda@netscape.com<br />
+: rss-spec-0.91.html,v $<br />
+Revision 1.1.2.2  2001/11/09 08:10:07  dprusak<br />
+Merged for 6.2<br />
+<br />
+Revision 1.1.2.1  2001/10/17 22:25:28  dprusak<br />
+NewMyNetscape<br />
+Revision 1.1.2.1  2001/05/03 00:44:50  hoangtv<br />
+adding DTD definition<br />
+Revision 1.4  1999/09/10 03:01:44  jquach<br />
+removed comments<br />
+Revision 1.3  1999/09/10 03:01:24  jquach<br />
+pulled ref to internal file<br />
+Revision 1.2  1999/08/07 04:53:02  danda<br />
+'cleaning' (removing useful info) for public release<br />
+Revision 1.3  1999/08/07 04:52:12  danda<br />
+'cleaning' (removing useful info) for public release<br />
+Revision 1.2  1999/07/22 07:09:41  danda<br />
+fixing examples, RDF Site Summary -> Rich Site Summary<br />
+Revision 1.1  1999/06/09 07:01:29  danda<br />
+adding schema and dtd for rss 0.9 and 1.0<br />
+--><br />
+&lt;!--<br /> 
+Tag: Schema<br />
+Description: Document wrapper. <br /> 
+Sub tags: Element &amp; Attribute<br />
+Attributes: version, root, name<br />
+Notes: <br />
+version must be "DKHXVF 1.0"<br />
+root is the document root.<br />
+--><br />
+&lt;!ELEMENT Schema (Element | Attribute)*><br />
+&lt;!ATTLIST Schema<br />
+version   CDATA    #FIXED "DKHXVF 1.0"<br />
+root      CDATA    #REQUIRED<br />
+name      CDATA    #REQUIRED><br />
+&lt;!-- <br />
+Tag: Element<br />
+Description: Definition of an allowed element (tag)  <br />
+Sub tags: Contains, Attrib, Matches<br />
+Attributes: id, type, min, max, exactly<br />
+Notes: exactly="1" is equivalent to min="1" max="1"<br />
+--><br />
+&lt;!ELEMENT Element ((Contains | Attrib)* | Matches?)><br />
+&lt;!ATTLIST Element<br />
+id        CDATA    #REQUIRED<br />
+type      (int | float | container | string | timestamp)    #REQUIRED<br />
+min       CDATA    #IMPLIED<br />
+max       CDATA    #IMPLIED<br />
+exactly   CDATA    #IMPLIED><br />
+&lt;!-- <br />
+Tag: Contains<br />
+Description: Defines rules for a sub-element.  <br />
+Sub tags: None, this tag must be empty.<br />
+Attributes: ref, min, max, exactly<br />
+Notes: ref must refer to the 'id' of an element defined elsewhere or the schema<br />
+is invalid.<br />
+--><br />
+&lt;!ELEMENT Contains EMPTY><br />
+&lt;!ATTLIST Contains<br />
+ref       CDATA    #REQUIRED<br />
+min       CDATA    #IMPLIED<br />
+max       CDATA    #IMPLIED<br />
+exactly   CDATA    #IMPLIED><br />
+&lt;!-- <br />
+Tag: Attrib<br />
+Description: Defines rules for an element attribute.<br />  
+Sub tags: None, this tag must be empty<br />
+Attributes: ref, min, max, exactly<br />
+Notes: ref must refer to the 'id' of an Attribute defined elsewhere or the schema<br />
+is invalid.<br />
+--><br />
+&lt;!ELEMENT Attrib EMPTY><br />
+&lt;!ATTLIST Attrib<br />
+ref      CDATA     #REQUIRED<br />
+min      CDATA     #IMPLIED<br />
+max      CDATA     #IMPLIED<br />
+exactly  CDATA     #IMPLIED><br />
+&lt;!-- <br />
+Tag: Attribute<br />
+Description: Definition of an allowed attribute  <br />
+Sub tags: Matches<br />
+Attributes: id, type, min, max, exactly<br />
+Notes: none<br />
+--><br />
+&lt;!ELEMENT Attribute (Matches?)><br />
+&lt;!ATTLIST Attribute<br />
+id        CDATA    #REQUIRED<br />
+type      (int | float | string | timestamp)    #REQUIRED<br />
+min       CDATA    #IMPLIED<br />
+max       CDATA    #IMPLIED<br />
+exactly   CDATA    #IMPLIED><br />
+&lt;!-- <br />
+Tag: Matches<br />
+Description: A regular expression that values will be compared against<br />
+Sub tags: None<br />
+Attributes: None<br />
+Notes: Matches may be used for elements of any type but container, and for attributes.<br />
+An example of a useful matching pattern is:<br />
+&lt;Matches>^(foo|bar|foobar)$&lt;/Matches><br />
+This will allow any values that exactly match "foo", "bar", or "foobar".<br />
+Whitespace is allowed in the regex and '#' is used for comments.  The following<br />
+is valid:<br />
+&lt;Matches><br />
+&amp;#                      # Start of a numeric entity reference, xml escaped &amp;<br />
+(?P&lt;char&gt;             # xml escaped &lt;, ><br />
+[0-9]+[^0-9]                # Decimal form<br />
+| 0[0-7]+[^0-7]             # Octal form<br />
+| x[0-9a-fA-F]+[^0-9a-fA-F] # Hexadecimal form<br />
+)<br />
+&lt;/Matches><br />
+which is equivalent to:
+&lt;Matches>&amp;#(?P&lt;char&gt;[0-9]+[^0-9]| 0[0-7]+[^0-7]| x[0-9a-fA-F]+[^0-9a-fA-F])&lt;/Matches><br />
+For help on regular expressions, see:<br />
+http://www.python.org/doc/howto/regex/regex.html or<br />
+http://www.ciser.cornell.edu/info/regex.html<br />
+--><br />
+&lt;!ELEMENT Matches (#PCDATA)><br />
+&lt;!--<br />
+Example of a DKHXVF 1.0 file:<br />
+&lt;?xml version="1.0"?><br />
+&lt;!DOCTYPE Schema PUBLIC "-//Netscape Communications//DTD Schema 1.0//EN" "http://my.netscape.com/publish/formats/schema-1.0.dtd"><br />
+&lt;Schema version="DKHXVF 1.0" root="rdf:RDF" name="RSS 0.9"><br />
+&lt;Element id="rdf:RDF" type="container"><br />
+&lt;Contains ref="channel" exactly="1"/><br />
+&lt;Contains ref="image" min="0" max="1"/><br />
+&lt;Contains ref="item" min="1" max="15"/><br />
+&lt;Contains ref="textinput" min="0" max="1"/><br />
+&lt;Attrib ref="xmlns" exactly="1"/><br />
+&lt;Attrib ref="xmlns:rdf" exactly="1"/><br />
+&lt;/Element><br />
+&lt;Attribute id="xmlns" type="string"><br />
+&lt;Matches>http://my.netscape.com/rdf/simple/0.9/&lt;/Matches><br />
+&lt;/Attribute><br />
+&lt;Attribute id="xmlns:rdf" type="string"><br />
+&lt;Matches>http://www.w3.org/1999/02/22-rdf-syntax-ns#&lt;/Matches><br />
+&lt;/Attribute><br />
+&lt;Element id="channel" type="container"><br />
+&lt;Contains ref="link" exactly="1"/><br />
+&lt;Contains ref="title" exactly="1"/><br />
+&lt;Contains ref="description" exactly="1"/><br />
+&lt;/Element><br />
+&lt;Element id="item" type="container"><br />
+&lt;Contains ref="title" exactly="1"/><br />
+&lt;Contains ref="link" exactly="1"/><br />
+&lt;/Element><br />
+&lt;Element id="image" type="container"><br />
+&lt;Contains ref="title" exactly="1"/><br />
+&lt;Contains ref="link" exactly="1" /><br />
+&lt;Contains ref="url" exactly="1"/><br />
+&lt;/Element><br />
+&lt;Element id="textinput" type="container"><br />
+&lt;Contains ref="title" exactly="1"/><br />
+&lt;Contains ref="description" exactly="1"/><br />
+&lt;Contains ref="link" exactly="1"/><br />
+&lt;Contains ref="name" exactly="1"/><br />
+&lt;/Element><br />
+&lt;Element id="title" type="string" min="1" max="100"/><br />
+&lt;Element id="description" type="string" min="1" max="500"/><br />
+&lt;Element id="url" type="string" min="1" max="500"><br />
+&lt;Matches>^(http://|^ftp://)&lt;/Matches><br />
+&lt;/Element><br />
+&lt;Element id="link" type="string" min="1" max="500"><br />
+&lt;Matches>^(http://|^ftp://)&lt;/Matches><br />
+&lt;/Element><br />
+&lt;Element id="name" type="string" min="1" max="20"/><br />
+&lt;/Schema><br />
+-->
+</p> 
+</div><!-- End Main Content -->
+</div></td>
+<td class="sidebar">
+<!-- Begin Sidebar -->
+
+<div class="sidebargroup">
+<div class="sidebartitle">Main Menu</div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/">RSS Advisory Board</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-specification">RSS Specification</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-profile">RSS Profile</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-validator">RSS Validator</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-autodiscovery">RSS Autodiscovery</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/advisory-board">Board Members</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/charter" rel="nofollow">Charter</a></div>
+<div class="sidebarlink"><a href="http://groups.yahoo.com/group/rss-board" rel="nofollow">RSS-Board Mailing List</a></div>
+<div class="sidebarlink"><a href="http://groups.yahoo.com/group/rss-public" rel="nofollow">RSS-Public Mailing List</a></div>
+<div class="sidebarlink"><a href="http://groups.yahoo.com/group/rss-media" rel="nofollow">RSS-Media Mailing List</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-language-codes">RSS Language Codes</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rsscloud-interface">RSSCloud Interface</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-history">RSS History</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-playground">RSS Playground</a></div>
+</div>
+
+<div class="sidebargroup">
+<div class="sidebartitle">RSS Feeds</div>
+
+<div class="sidebarrsslink"><a href="http://feeds.rssboard.org/rssboard" rel=\"nofollow\"><img src="/images/rss-icon.png" alt="Subscribe to Really Simple Syndication" border="0" width="16" height="16" /></a> <a href="http://feeds.rssboard.org/rssboard" rel=\"nofollow\">This Weblog</a></div>
+<div class="sidebarrsslink"><a href="http://rss.groups.yahoo.com/group/rss-board/rss" rel=\"nofollow\"><img src="/images/rss-icon.png" alt="Subscribe to RSS-Board" border="0" width="16" height="16" /></a> <a href="http://rss.groups.yahoo.com/group/rss-board/rss" rel=\"nofollow\">RSS-Board</a></div>
+<div class="sidebarrsslink"><a href="http://rss.groups.yahoo.com/group/rss-public/rss" rel=\"nofollow\"><img src="/images/rss-icon.png" alt="Subscribe to RSS-Public" border="0" width="16" height="16" /></a> <a href="http://rss.groups.yahoo.com/group/rss-public/rss" rel=\"nofollow\">RSS-Public</a></div>
+<div class="sidebarrsslink"><a href="http://rss.groups.yahoo.com/group/rss-media/rss" rel=\"nofollow\"><img src="/images/rss-icon.png" alt="Subscribe to RSS-Media" border="0" width="16" height="16" /></a> <a href="http://rss.groups.yahoo.com/group/rss-media/rss" rel=\"nofollow\">RSS-Media</a></div>
+<p align="center"><a href="http://feeds.rssboard.org/rssboard" rel=\"nofollow\"><img src="http://feeds.feedburner.com/~fc/rssboard?bg=FF6600&amp;fg=000000&amp;anim=1" height="26" width="88" style="border:0" alt="" /></a></p>
+
+</div>
+
+<div class="sidebargroup">
+<div class="sidebartitle">Spec Library</div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-specification">Current</a></div><div class="sidebarlink"><a href="http://www.rssboard.org/rss-2-0-1">2.0.1</a></div><div class="sidebarlink"><a href="http://www.rssboard.org/rss-2-0">2.0</a></div><div class="sidebarlink"><a href="http://www.rssboard.org/rss-0-9-2">0.92</a></div><div class="sidebarlink"><a href="http://www.rssboard.org/rss-0-9-1">0.91</a> (UserLand)</div><div class="sidebarlink"><a href="http://www.rssboard.org/rss-0-9-1-netscape">0.91</a> (Netscape)</div><div class="sidebarlink"><a href="http://www.rssboard.org/rss-0-9-0">0.90</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-change-notes">RSS Change Notes</a></div>
+</div>
+
+<div class="sidebargroup">
+<div class="sidebartitle">Namespaces</div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/creative-commons">Creative Commons</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/trackback">Trackback</a></div>
+</div>
+
+<div class="sidebargroup">
+<div class="sidebartitle">Archive</div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/site-index" rel="nofollow">Site Index</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/skip-hours-days">SkipHours and SkipDays</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-encoding-examples">RSS Encoding Examples</a></div>
+<div class="sidebarlink"><a href="http://www.rssboard.org/rss-articles">Articles</a></div>
+</div>
+
+<div class="sidebargroup">
+<div class="sidebartitle">Board Members</div>
+<div class="sidebarlink"><a href="http://workbench.cadenhead.org/">Rogers Cadenhead</a></div>
+<div class="sidebarlink"><a href="http://www.chipsquips.com/">Sterling "Chip" Camden</a></div>
+<div class="sidebarlink"><a href="http://www.simonecarletti.com/">Simone Carletti</a></div>
+<div class="sidebarlink"><a href="http://www.xn--8ws00zhy3a.com/">James Holderness</a></div>
+<div class="sidebarlink"><a href="http://www.theshiftedlibrarian.com/">Jenny Levine</a></div>
+<div class="sidebarlink"><a href="http://www.burningdoor.com/eric/">Eric Lunt</a></div>
+<div class="sidebarlink"><a href="http://www.kbcafe.com/rss/">Randy Charles Morin</a></div>
+<div class="sidebarlink"><a href="http://ryanparman.com/">Ryan Parman</a></div>
+<div class="sidebarlink"><a href="http://www.jakesavin.com/">Jake Savin</a></div>
+<div class="sidebarlink"><a href="http://www.shellen.com/">Jason Shellen</a></div>
+<div class="sidebarlink"><a href="http://journal.paul.querna.org/">Paul Querna</a></div>
+</div>
+<div class="sidebargroup">
+<div class="sidebartitle">Other Formats</div>
+<div class="sidebarlink"><a href="http://www.atomenabled.org/" rel="nofollow">Atom</a></div>
+<div class="sidebarlink"><a href="http://web.resource.org/rss/1.0/" rel="nofollow">RDF Site Summary</a></div>
+</div>
+<div class="sidebargroup">
+<div class="sidebartitle">Links</div>
+<div class="sidebarlink"><a href="http://www.icerocket.com/search?tab=blog&q=link%3Awww.rssboard.org">Find on IceRocket</a></a></div>
+</div>
+
+<!-- End Sidebar -->
+</td>
+</tr>
+</table>
+<!-- End Page -->
+<div class="footer">
+<p><a href="/">RSS Advisory Board</a> |
+<a href="http://feeds.rssboard.org/rssboard">RSS Feed</a> |
+<a href="http://www.rssboard.org/rss-specification">RSS Spec</a> |
+Hosted by <a href="http://www.worldreadable.com/">World Readable</a></p>
+</div>
+<!-- Google Analytics Tracking -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-631537-4";
+urchinTracker();
+</script>
+<!-- End Google Analytics Tracking -->
+</div>
+</body>
+</html>	
