@@ -76,6 +76,7 @@
         :drakma
         :flexi-streams
         :sanitize)
+  (:shadow :call)
   (:import-from :httpd0.responses :universal-time-to-http-date)
   (:export :athens-service
            :initialize-database
