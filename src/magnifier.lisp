@@ -741,6 +741,20 @@ ATOM feeds to be archived.")
   (:load ()
     (inject-css "body { padding: 0.5em; font-family: sans-serif; }")
     (inject-css "p { margin: 0.2em 0 0 0; }")
+    (inject-css
+     "input { border: none;
+              border-bottom: medium solid lightgrey; }
+      input:focus { border-color: grey; }")
+    (inject-css
+     "button { margin: 0 0.2em;
+               font-size: x-small;
+	       font-weight: bold;
+	       color: #6666ff;
+	       border: medium solid #6666ff;
+	       border-radius: 5em;
+	       background: none; }
+      button:hover { background: #6666ff;
+	             color: white; }")
     (let ((body (@ document :body)))
       (send append-child body
             (render-menus *timeframe*
