@@ -412,7 +412,7 @@ CALLBACK."
       (3 (list p q v))
       (4 (list tt p v))
       (5 (list v p q))
-      (otherwise (throw (+ "Bad hue value: " h))))))
+      (6 (list v p q)))))
 
 (defun hash-color (n)
   (let ((rgb (hsv-to-rgb (% (* n *hash-color-interval*) 1)
