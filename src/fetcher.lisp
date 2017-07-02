@@ -35,12 +35,15 @@ includes «Accept-Charset» to favor UTF-8."
       (http-request url
                     :method :get
                     :redirect 1
-                    :additional-headers (headers date)
+                    :additional-headers (when date (headers date))
                     :deadline (+ (* timeout internal-time-units-per-second)
                                  (get-internal-real-time)))
     (ecase status
       (200 body)
-      (304 (signal 'not-modified)))))
+      (304 (signal 'not-modified))
+      ;; Bad request might mean the server does not support If-Modified-Since,
+      ;; retry with simpler request.
+      (400 (http-get url () timeout)))))
 
 (defun pull-feed (url if-modified-since timeout)
   (handler-case (with-flexi-use-value
