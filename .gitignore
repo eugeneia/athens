@@ -1,2 +1,4 @@
 bin/
 athens.conf
+quicklisp/tmp
+quicklisp/dists/quicklisp/archives
