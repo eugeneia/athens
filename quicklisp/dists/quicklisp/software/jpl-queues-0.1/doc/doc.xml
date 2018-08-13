@@ -1,0 +1,533 @@
+<?xml version="1.0"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+          "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <artheader id="top">
+    <title>jpl-queues</title>
+    <author><firstname>J.P.</firstname> <surname>Larocque</surname></author>
+  </artheader>
+  
+  <section id="sec-intro">
+    <title>Introduction</title>
+    
+    <para>jpl-queues is a Common Lisp library implementing a few
+      different kinds of queues.</para>
+    
+    <para>These kinds of queues are provided:</para>
+    <itemizedlist>
+      <listitem><link linkend="sec-classes-bounded_fifo_queue">Bounded</link>
+	and <link linkend="sec-classes-unbounded_fifo_queue">unbounded
+	FIFO queues</link>.</listitem>
+      
+      <listitem><link linkend="sec-classes-lossy_bounded_fifo_queue">Lossy bounded FIFO queues</link> that drop elements when
+	full.</listitem>
+      
+      <listitem><link linkend="sec-classes-unbounded_random_queue">Unbounded
+	random-order queues</link> that use less memory than unbounded
+	FIFO queues.</listitem>
+    </itemizedlist>
+    
+    <para>Additionally,
+      a <link linkend="sec-classes-synchronized_queue">synchronization
+      wrapper</link> is provided to make any queue conforming to
+      the <link linkend="sec-api">jpl-queues API</link> thread-safe
+      for lightweight multithreading applications.
+      (See <ulink url="http://www.thoughtcrime.us/software/calispel/">Calispel</ulink>
+      for a more sophisticated CL multithreaded message-passing
+      library with timeouts and alternation among several blockable
+      channels.)</para>
+    
+    <para>jpl-queues is used
+      by <ulink url="http://www.thoughtcrime.us/software/calispel/">Calispel</ulink>.</para>
+    
+    <section id="sec-obtaining">
+      <title>Obtaining jpl-queues</title>
+      
+      <para>The latest version of jpl-queues, with accompanying
+      documentation, can be found at:
+      <ulink url="http://www.thoughtcrime.us/software/jpl-queues/"/></para>
+      
+      <para>The most recent release is 0.1, released 2009-10-19.  It
+	depends on:
+	<simplelist type="inline">
+	  <member><ulink url="http://www.thoughtcrime.us/software/cl-jpl-util/">cl-jpl-util</ulink>
+	    0.2</member>
+	  <member><ulink url="http://common-lisp.net/project/bordeaux-threads/">Bordeaux Threads</ulink></member>
+	</simplelist>
+	
+	<itemizedlist>
+	  <listitem><ulink url="http://www.thoughtcrime.us/software/jpl-queues/jpl-queues-0.1.tar.gz">jpl-queues-0.1.tar.gz</ulink>:
+	    ASDF package</listitem>
+	  <listitem><ulink url="http://www.thoughtcrime.us/software/jpl-queues/jpl-queues-0.1.tar.gz.sign">jpl-queues-0.1.tar.gz.sign</ulink>:
+            OpenPGP detached signature</listitem>
+	</itemizedlist>
+      </para>
+    
+      <para>I sign all my software with OpenPGP, key ID 0x80555CED7394F948,
+	fingerprint 2771 AF53 5D09 BDFB A8D0 BEF3 8055 5CED 7394 F948.</para>
+    </section>
+    
+    <section id="sec-copying">
+      <title>Copying</title>
+      
+      <para>The software and this document are licensed under
+	permissive, BSD-like terms, copied from the ISC
+	license:</para>
+      
+      <blockquote>
+	<para>Copyright &copy; 2009, Jean-Paul Guy Larocque</para>
+	
+	<para>Permission to use, copy, modify, and/or distribute this
+	  software for any purpose with or without fee is hereby
+	  granted, provided that the above copyright notice and this
+	  permission notice appear in all copies.</para>
+	
+	<para>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR
+	  DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE
+	  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+	  FITNESS.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+	  SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+	  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+	  PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+	  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH
+	  THE USE OR PERFORMANCE OF THIS SOFTWARE.</para>
+      </blockquote>
+    </section>
+    
+    <section id="sec-contact">
+      <title>Contact Information</title>
+      
+      <para>The author welcomes feedback, questions, help requests,
+	and bug reports via e-mail: J.P. Larocque &lt;jpl-software at
+	thoughtcrime.us&gt;</para>
+    </section>
+  </section>
+    
+  <section id="sec-examples">
+    <title>Examples</title>
+    
+    <para>Create a queue that can hold an unlimited number of elements
+      in FIFO order, which is not permitted to drop elements:</para>
+    
+    <informalexample>
+      <programlisting>(defparameter *queue*
+  (make-instance 'jpl-queues:unbounded-fifo-queue))</programlisting>
+    </informalexample>
+    
+    <para>Enqueue some elements:</para>
+    
+    <informalexample>
+      <programlisting>(loop for i below 10
+      until (jpl-queues:full? *queue*)
+      doing (jpl-queues:enqueue i *queue*))</programlisting>
+    </informalexample>
+    
+    <para>(Note that because our queue is unbounded, the
+      <link linkend="sec-api-full"><function>FULL?</function></link>
+      check is, strictly speaking, unnecessary.  However, it's good
+      habit to check the queue first.  Enqueuing to a full queue or
+      dequeuing from an empty queue may corrupt the queue's
+      state.)</para>
+    
+    <para>Dequeue those elements:</para>
+      
+    <informalexample>
+      <programlisting>(loop until (jpl-queues:empty? *queue*)
+      collecting (jpl-queues:dequeue *queue*))
+=&gt; (0 1 2 3 4 5 6 7 8 9)</programlisting>
+    </informalexample>
+  </section>
+  
+  <section id="sec-reference">
+    <title>Reference</title>
+    
+    <section id="sec-classes">
+      <title>Queue Classes</title>
+      
+      <para>Several classes are available, each offering different
+	queuing policies.</para>
+      
+      <para>Queues can be classified in a few different
+	dimensions:</para>
+    
+      <variablelist>
+	<varlistentry>
+	  <term>Element order</term>
+	  <listitem>Typically FIFO (first-in, first-out), where the
+	    order of elements coming out is the same as the order of
+	    elements going in.  Another possibility is random-order,
+	    where the choice of an element upon dequeuing is random
+	    among the available enqueued elements.</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>Boundedness</term>
+	  <listitem>Whether a queue has a fixed upper-bound to the
+	    number of elements it can have enqueued.  When a class of
+	    queue is bounded, the specific capacity is chosen at
+	    instantiation-time.</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>Exactness</term>
+	  <listitem>Whether a queue is required to keep each enqueued
+	    element.  A non-exact (or lossy) queue may drop elements
+	    to make room for new ones.</listitem>
+	</varlistentry>
+      </variablelist>
+      
+      <para>Queues are created by
+      calling <ulink url="http://www.lispworks.com/documentation/HyperSpec/Body/f_mk_ins.htm#make-instance"><function>MAKE-INSTANCE</function></ulink>
+      with the name of one of the concrete queue classes.  The queue
+      classes are described below.</para>
+      
+      <section id="sec-classes-queue">
+	<title>The <type>QUEUE</type> Abstract Class</title>
+	
+	<para>A queue stores values which are enqueued, to be dequeued
+	  at a later time.</para>
+	
+	<para>The <type>QUEUE</type> abstract class cannot be directly
+	  instantiated and used by itself.  Clients must instantiate a
+	  subclass that provides specific queuing policies, or
+	  subclass <type>QUEUE</type> to implement their own queue
+	  according to the jpl-queues API: see
+	  <xref linkend="sec-api"/></para>
+      </section>
+      
+      <section id="sec-classes-bounded_fifo_queue">
+	<title>The <type>BOUNDED-FIFO-QUEUE</type> Class</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>MAKE-INSTANCE</function> <literal>'BOUNDED-FIFO-QUEUE</literal> &amp;key <varname>CAPACITY</varname>)
+=&gt; <emphasis>(A <type>BOUNDED-FIFO-QUEUE</type> instance.)</emphasis></synopsis>
+	</formalpara>
+	
+	<para>A bounded FIFO queue.  The queue capacity (a positive
+	  integer less
+	  than <ulink url="http://www.lispworks.com/documentation/HyperSpec/Body/v_ar_dim.htm#array-dimension-limit"><varname>ARRAY-DIMENSION-LIMIT</varname></ulink>)
+	  must be specified with the <varname>:CAPACITY</varname>
+	  keyword parameter.</para>
+	
+	<para>Space usage is constant after instantiation, in
+	  proportion to the capacity.  Conses little, if at all, for
+	  any operation.</para>
+      </section>
+      
+      <section id="sec-classes-unbounded_fifo_queue">
+	<title>The <type>UNBOUNDED-FIFO-QUEUE</type> Class</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>MAKE-INSTANCE</function> <literal>'UNBOUNDED-FIFO-QUEUE</literal>)
+=&gt; <emphasis>(An <type>UNBOUNDED-FIFO-QUEUE</type> instance.)</emphasis></synopsis>
+	</formalpara>
+	
+	<para>An unbounded FIFO queue.</para>
+	
+	<para>Space usage is proportional to the number of queued
+	  elements at any given point in time.  Conses for each
+	  enqueued element.</para>
+      </section>
+      
+      <section id="sec-classes-lossy_bounded_fifo_queue">
+	<title>The <type>LOSSY-BOUNDED-FIFO-QUEUE</type> Class</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>MAKE-INSTANCE</function> <literal>'LOSSY-BOUNDED-FIFO-QUEUE</literal> &amp;key <varname>CAPACITY</varname>)
+=&gt; <emphasis>(A <type>LOSSY-BOUNDED-FIFO-QUEUE</type> instance.)</emphasis></synopsis>
+	</formalpara>
+	
+	<para>A bounded FIFO queue that throws away old entries
+	  when <link linkend="sec-api-enqueue"><function>ENQUEUE</function></link>
+	  is called and the queue is full.  A queue capacity (a
+	  positive integer less
+	  than <ulink url="http://www.lispworks.com/documentation/HyperSpec/Body/v_ar_dim.htm#array-dimension-limit"><varname>ARRAY-DIMENSION-LIMIT</varname></ulink>)
+	  must be specified with the <varname>:CAPACITY</varname>
+	  keyword parameter.</para>
+	
+	<para>Space usage is constant after instantiation, in
+	  proportion to the capacity.  Conses little, if at all, for
+	  any operation.</para>
+      </section>
+      
+      <section id="sec-classes-unbounded_random_queue">
+	<title>The <type>UNBOUNDED-RANDOM-QUEUE</type> Class</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>MAKE-INSTANCE</function> <literal>'UNBOUNDED-RANDOM-QUEUE</literal> &amp;key <varname>CAPACITY</varname>)
+=&gt; <emphasis>(An <type>UNBOUNDED-RANDOM-QUEUE</type> instance.)</emphasis></synopsis>
+	</formalpara>
+
+	<para>A virtually unbounded, random-order queue.  (Strictly
+	  speaking, the queue size must be less than
+	  <ulink url="http://www.lispworks.com/documentation/HyperSpec/Body/v_ar_dim.htm#array-dimension-limit"><varname>ARRAY-DIMENSION-LIMIT</varname></ulink>.)</para>
+	
+	<para>Space usage is proportional to the peak number of queued
+	  elements over the lifetime of the queue.  An initial queue
+	  capacity (a positive integer less
+	  than <varname>ARRAY-DIMENSION-LIMIT</varname>) may
+	  optionally be specified with
+	  the <varname>:CAPACITY</varname> keyword parameter; the
+	  capacity will be grown as required.  Conses for an enqueued
+	  element only when the current queue capacity is reached and
+	  needs to be extended.</para>
+      </section>
+      
+      <section id="sec-classes-synchronized_queue">
+	<title>The <type>SYNCHRONIZED-QUEUE</type> Class</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>MAKE-INSTANCE</function> <literal>'SYNCHRONIZED-QUEUE</literal> &amp;key <varname>QUEUE</varname>)
+=&gt; <emphasis>(A <type>SYNCHRONIZED-QUEUE</type> instance.)</emphasis></synopsis>
+	</formalpara>
+	
+	<para>Wraps another <type>QUEUE</type> (given by
+	  the <varname>:QUEUE</varname> keyword parameter),
+	  synchronizing operations for safe multithreaded access.
+	  After instantiating this queue, the
+	  wrapped <type>QUEUE</type> must not be directly used for the
+	  duration of this queue.</para>
+	
+	<para>When <link linkend="sec-api-enqueue"><function>ENQUEUE</function></link>
+	  is called on this <type>QUEUE</type> and the
+	  wrapped <type>QUEUE</type> is full, blocks until it is no
+	  longer full.
+	  When <link linkend="sec-api-dequeue"><function>DEQUEUE</function></link>
+	  is called on this <type>QUEUE</type> and the
+	  wrapped <type>QUEUE</type> is empty, blocks until it is no
+	  longer empty.  This blocking also ensures that the internal
+	  state of the wrapped <type>QUEUE</type> won't be corrupted
+	  by calling <function>DEQUEUE</function> when empty
+	  or <function>ENQUEUE</function> when full.</para>
+	
+	<para>Operations that should return no useful value will
+	  return no values.</para>
+	
+	<para>The time and space complexity for this queue and all its
+	  operations are equal to those of the
+	  wrapped <type>QUEUE</type>, plus any locking overhead
+	  imposed by the system, except
+	  that <function>ENQUEUE</function>
+	  and <function>DEQUEUE</function> may block
+	  indefinitely.</para>
+      </section>
+    </section>
+    
+    <section id="sec-api">
+      <title>The jpl-queues API</title>
+      
+      <para>This section defines several generic functions that apply
+	to any instance of a concrete subclass
+	of <type>QUEUE</type>.</para>
+      
+      <para>Unless operating on an instance of a subclass that is
+	designed to support thread-safe access, no two operations may
+	occur at the same time in a multithreaded scenario, or else
+	either an incorrect or inconsistent answer may be returned, or
+	the internal state of the queue may be corrupted.</para>
+      
+      <para>Implementers of <type>QUEUE</type> subclasses are expected
+	to define methods for most of these functions.  Some functions
+	have default methods which, for most <type>QUEUE</type>
+	subclasses, infer correct answers from other functions.  Refer
+	to <filename>interface.lisp</filename> to find which functions
+	have default methods and what their semantics are.</para>
+      
+      <!-- FIXME: generate these following sections automatically from
+	   docstrings. -->
+      
+      <section id="sec-api-empty">
+	<title><function>EMPTY?</function>: Ability to Dequeue
+	  Elements</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>EMPTY?</function> <varname>QUEUE</varname>)
+=&gt; <emphasis>boolean</emphasis></synopsis>
+	</formalpara>
+	
+	<para><function>EMPTY?</function> returns a boolean indicating
+	  whether the given <varname>QUEUE</varname> cannot have any
+	  more elements dequeued from it.  When this function returns
+	  false, it is safe to
+	  call <link linkend="sec-api-dequeue"><function>DEQUEUE</function></link>.</para>
+	
+	<para>Most implementations will take constant time.</para>
+      </section>
+      
+      <section id="sec-api-full">
+	<title><function>FULL?</function>: Ability to Enqueue
+	  Elements</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>FULL?</function> <varname>QUEUE</varname>)
+=&gt; <emphasis>boolean</emphasis></synopsis>
+	</formalpara>
+	
+	<para><function>FULL?</function> returns a boolean indicating
+	  whether the given <varname>QUEUE</varname> cannot have any
+	  more elements enqueued to it.  When this function returns
+	  false, it is safe to
+	  call <link linkend="sec-api-enqueue"><function>ENQUEUE</function></link>.</para>
+	
+	<para>This is subtly different than saying
+	  its <link linkend="sec-api-size"><function>SIZE</function></link>
+	  is equal to
+	  its <link linkend="sec-api-capacity"><function>CAPACITY</function></link>:
+	  a lossy queue may have a capacity, and it may be "full" in
+	  that sense, but it will still accept new elements to be
+	  enqueued.</para>
+	
+	<para>Most implementations will take constant time.</para>
+      </section>
+      
+      <section id="sec-api-size">
+	<title><function>SIZE</function>: Enqueued Element
+	  Count</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>SIZE</function> <varname>QUEUE</varname>)
+=&gt; <emphasis>(A non-negative integer.)</emphasis></synopsis>	
+	</formalpara>
+	
+	<para>Returns the number of elements stored
+	in <varname>QUEUE</varname>.</para>
+	
+	<para>Most implementations will take constant time.</para>
+      </section>
+      
+      <section id="sec-api-capacity">
+	<title><function>CAPACITY</function>: Enqueued Element
+	  Limit</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>CAPACITY</function> <varname>QUEUE</varname>)
+=&gt; <emphasis>(a non-negative integer, or <literal>NIL</literal>)</emphasis></synopsis>
+	</formalpara>
+	
+	<para>Returns the number of elements that can be stored at
+	  once in the given <varname>QUEUE</varname>,
+	  or <literal>NIL</literal> if there is no limit.</para>
+	
+	<para>Most implementations will take constant time.</para>
+      </section>
+      
+      <section id="sec-api-enqueue">
+	<title><function>ENQUEUE</function>: Add an Element</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>ENQUEUE</function> <varname>OBJECT</varname> <varname>QUEUE</varname>)
+=&gt; <emphasis>(unspecified)</emphasis></synopsis>
+	</formalpara>
+	
+	<para>Writes <varname>OBJECT</varname>
+	  to <varname>QUEUE</varname>.</para>
+	
+	<para>After this function
+	  returns, <link linkend="sec-api-empty"><function>EMPTY?</function></link>
+	  must return false.</para>
+	
+	<para>It is the caller's responsibility to determine
+	  whether <varname>QUEUE</varname> has room for another
+	  element.  The consequences are undefined if it
+	  doesn't.</para>
+	
+	<para>Most implementations will take constant time.</para>
+      </section>
+      
+      <section id="sec-api-dequeue">
+	<title><function>DEQUEUE</function>: Remove an Element</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>DEQUEUE</function> <varname>QUEUE</varname>)
+=&gt; <varname>OBJECT</varname></synopsis>
+	</formalpara>
+	
+	<para>Removes an element from <varname>QUEUE</varname>,
+	  returning the element.</para>
+	
+	<para>After this function
+	  returns, <link linkend="sec-api-full"><function>FULL?</function></link>
+	  must return false.</para>
+	
+	<para>It is the caller's responsibility to determine
+	  whether <varname>QUEUE</varname> has an element available
+	  for reading.  The consequences are undefined if it
+	  doesn't.</para>
+	
+	<para>Most implementations will take constant time.</para>
+      </section>
+      
+      <section id="sec-api-dequeue_object">
+	<title><function>DEQUEUE-OBJECT</function> and
+	  <function>DEQUEUE-OBJECT-IF</function>: Conditional Removal
+	  of Elements</title>
+	
+	<formalpara>
+	  <title>Syntax</title>
+	  
+	  <synopsis>(<function>DEQUEUE-OBJECT</function> <varname>OBJECT</varname> <varname>QUEUE</varname> &amp;key <varname>TEST</varname> <varname>KEY</varname>)
+=&gt; <emphasis>(unspecified)</emphasis></synopsis>
+	  
+	  <synopsis>(<function>DEQUEUE-OBJECT-IF</function> <varname>PREDICATE</varname> <varname>QUEUE</varname> &amp;key <varname>KEY</varname>)
+=&gt; <emphasis>(unspecified)</emphasis></synopsis>
+	</formalpara>
+	
+	<para>Prematurely dequeues elements
+	  from <varname>QUEUE</varname>.</para>
+	
+	<para><function>DEQUEUE-OBJECT</function> dequeues each
+	  instance
+	  of <varname>OBJECT</varname>.  <varname>TEST</varname> is a
+	  function of two arguments that is used to
+	  compare <varname>OBJECT</varname> with the result
+	  of <varname>KEY</varname> applied to each enqueued element.
+	  When <varname>TEST</varname> returns true, the element is
+	  deleted.  Zero or more elements may be matched and
+	  removed.</para>
+	
+	<para><function>DEQUEUE-OBJECT-IF</function> dequeues each
+	  element that <varname>PREDICATE</varname> returns true
+	  for.  <varname>PREDICATE</varname> is called with the result
+	  of <varname>KEY</varname> applied to each enqueued element.
+	  When <varname>PREDICATE</varname> returns true, the element
+	  is deleted.  Zero or more elements may be matched and
+	  removed.</para>
+	
+	<para>If anything was actually
+	  removed, <link linkend="sec-api-full"><function>FULL?</function></link>
+	  must return false.</para>
+	  
+	<para>Most implementations
+	  of <function>DELETE-OBJECT</function> will have the same
+	  time complexity
+	  as <function>DELETE-OBJECT-IF</function>.</para>
+	  
+	<para>Most implementations
+	  of <function>DELETE-OBJECT-IF</function> will take time in
+	  linear proportion to the number of enqueued elements.</para>
+      </section>
+    </section>
+  </section>
+</article>

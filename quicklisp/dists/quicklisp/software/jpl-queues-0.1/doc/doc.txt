@@ -1,0 +1,362 @@
+jpl-queues
+
+J.P. Larocque
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Table of Contents
+
+1. Introduction
+
+    1.1. Obtaining jpl-queues
+    1.2. Copying
+    1.3. Contact Information
+
+2. Examples
+3. Reference
+
+    3.1. Queue Classes
+
+        3.1.1. The QUEUE Abstract Class
+        3.1.2. The BOUNDED-FIFO-QUEUE Class
+        3.1.3. The UNBOUNDED-FIFO-QUEUE Class
+        3.1.4. The LOSSY-BOUNDED-FIFO-QUEUE Class
+        3.1.5. The UNBOUNDED-RANDOM-QUEUE Class
+        3.1.6. The SYNCHRONIZED-QUEUE Class
+
+    3.2. The jpl-queues API
+
+        3.2.1. EMPTY?: Ability to Dequeue Elements
+        3.2.2. FULL?: Ability to Enqueue Elements
+        3.2.3. SIZE: Enqueued Element Count
+        3.2.4. CAPACITY: Enqueued Element Limit
+        3.2.5. ENQUEUE: Add an Element
+        3.2.6. DEQUEUE: Remove an Element
+        3.2.7. DEQUEUE-OBJECT and DEQUEUE-OBJECT-IF: Conditional Removal of
+            Elements
+
+1. Introduction
+
+jpl-queues is a Common Lisp library implementing a few different kinds of
+queues.
+
+These kinds of queues are provided:
+
+  ● Bounded and unbounded FIFO queues.
+  ● Lossy bounded FIFO queues that drop elements when full.
+  ● Unbounded random-order queues that use less memory than unbounded FIFO
+    queues.
+
+Additionally, a synchronization wrapper is provided to make any queue
+conforming to the jpl-queues API thread-safe for lightweight multithreading
+applications. (See Calispel for a more sophisticated CL multithreaded
+message-passing library with timeouts and alternation among several blockable
+channels.)
+
+jpl-queues is used by Calispel.
+
+1.1. Obtaining jpl-queues
+
+The latest version of jpl-queues, with accompanying documentation, can be found
+at: http://www.thoughtcrime.us/software/jpl-queues/
+
+The most recent release is 0.1, released 2009-10-19. It depends on: cl-jpl-util
+0.2, Bordeaux Threads
+
+  ● jpl-queues-0.1.tar.gz: ASDF package
+  ● jpl-queues-0.1.tar.gz.sign: OpenPGP detached signature
+
+I sign all my software with OpenPGP, key ID 0x80555CED7394F948, fingerprint
+2771 AF53 5D09 BDFB A8D0 BEF3 8055 5CED 7394 F948.
+
+1.2. Copying
+
+The software and this document are licensed under permissive, BSD-like terms,
+copied from the ISC license:
+
+    Copyright © 2009, Jean-Paul Guy Larocque
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+    SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+    IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+1.3. Contact Information
+
+The author welcomes feedback, questions, help requests, and bug reports via
+e-mail: J.P. Larocque <jpl-software at thoughtcrime.us>
+
+2. Examples
+
+Create a queue that can hold an unlimited number of elements in FIFO order,
+which is not permitted to drop elements:
+
+(defparameter *queue*
+  (make-instance 'jpl-queues:unbounded-fifo-queue))
+
+Enqueue some elements:
+
+(loop for i below 10
+      until (jpl-queues:full? *queue*)
+      doing (jpl-queues:enqueue i *queue*))
+
+(Note that because our queue is unbounded, the FULL? check is, strictly
+speaking, unnecessary. However, it's good habit to check the queue first.
+Enqueuing to a full queue or dequeuing from an empty queue may corrupt the
+queue's state.)
+
+Dequeue those elements:
+
+(loop until (jpl-queues:empty? *queue*)
+      collecting (jpl-queues:dequeue *queue*))
+=> (0 1 2 3 4 5 6 7 8 9)
+
+3. Reference
+
+3.1. Queue Classes
+
+Several classes are available, each offering different queuing policies.
+
+Queues can be classified in a few different dimensions:
+
+Element order
+    Typically FIFO (first-in, first-out), where the order of elements coming
+    out is the same as the order of elements going in. Another possibility is
+    random-order, where the choice of an element upon dequeuing is random among
+    the available enqueued elements.
+Boundedness
+    Whether a queue has a fixed upper-bound to the number of elements it can
+    have enqueued. When a class of queue is bounded, the specific capacity is
+    chosen at instantiation-time.
+Exactness
+    Whether a queue is required to keep each enqueued element. A non-exact (or
+    lossy) queue may drop elements to make room for new ones.
+
+Queues are created by calling MAKE-INSTANCE with the name of one of the
+concrete queue classes. The queue classes are described below.
+
+3.1.1. The QUEUE Abstract Class
+
+A queue stores values which are enqueued, to be dequeued at a later time.
+
+The QUEUE abstract class cannot be directly instantiated and used by itself.
+Clients must instantiate a subclass that provides specific queuing policies, or
+subclass QUEUE to implement their own queue according to the jpl-queues API:
+see Section 3.2, “The jpl-queues API”
+
+3.1.2. The BOUNDED-FIFO-QUEUE Class
+
+Syntax. 
+
+(MAKE-INSTANCE 'BOUNDED-FIFO-QUEUE &key CAPACITY)
+=> (A BOUNDED-FIFO-QUEUE instance.)
+
+A bounded FIFO queue. The queue capacity (a positive integer less than
+ARRAY-DIMENSION-LIMIT) must be specified with the :CAPACITY keyword parameter.
+
+Space usage is constant after instantiation, in proportion to the capacity.
+Conses little, if at all, for any operation.
+
+3.1.3. The UNBOUNDED-FIFO-QUEUE Class
+
+Syntax. 
+
+(MAKE-INSTANCE 'UNBOUNDED-FIFO-QUEUE)
+=> (An UNBOUNDED-FIFO-QUEUE instance.)
+
+An unbounded FIFO queue.
+
+Space usage is proportional to the number of queued elements at any given point
+in time. Conses for each enqueued element.
+
+3.1.4. The LOSSY-BOUNDED-FIFO-QUEUE Class
+
+Syntax. 
+
+(MAKE-INSTANCE 'LOSSY-BOUNDED-FIFO-QUEUE &key CAPACITY)
+=> (A LOSSY-BOUNDED-FIFO-QUEUE instance.)
+
+A bounded FIFO queue that throws away old entries when ENQUEUE is called and
+the queue is full. A queue capacity (a positive integer less than
+ARRAY-DIMENSION-LIMIT) must be specified with the :CAPACITY keyword parameter.
+
+Space usage is constant after instantiation, in proportion to the capacity.
+Conses little, if at all, for any operation.
+
+3.1.5. The UNBOUNDED-RANDOM-QUEUE Class
+
+Syntax. 
+
+(MAKE-INSTANCE 'UNBOUNDED-RANDOM-QUEUE &key CAPACITY)
+=> (An UNBOUNDED-RANDOM-QUEUE instance.)
+
+A virtually unbounded, random-order queue. (Strictly speaking, the queue size
+must be less than ARRAY-DIMENSION-LIMIT.)
+
+Space usage is proportional to the peak number of queued elements over the
+lifetime of the queue. An initial queue capacity (a positive integer less than
+ARRAY-DIMENSION-LIMIT) may optionally be specified with the :CAPACITY keyword
+parameter; the capacity will be grown as required. Conses for an enqueued
+element only when the current queue capacity is reached and needs to be
+extended.
+
+3.1.6. The SYNCHRONIZED-QUEUE Class
+
+Syntax. 
+
+(MAKE-INSTANCE 'SYNCHRONIZED-QUEUE &key QUEUE)
+=> (A SYNCHRONIZED-QUEUE instance.)
+
+Wraps another QUEUE (given by the :QUEUE keyword parameter), synchronizing
+operations for safe multithreaded access. After instantiating this queue, the
+wrapped QUEUE must not be directly used for the duration of this queue.
+
+When ENQUEUE is called on this QUEUE and the wrapped QUEUE is full, blocks
+until it is no longer full. When DEQUEUE is called on this QUEUE and the
+wrapped QUEUE is empty, blocks until it is no longer empty. This blocking also
+ensures that the internal state of the wrapped QUEUE won't be corrupted by
+calling DEQUEUE when empty or ENQUEUE when full.
+
+Operations that should return no useful value will return no values.
+
+The time and space complexity for this queue and all its operations are equal
+to those of the wrapped QUEUE, plus any locking overhead imposed by the system,
+except that ENQUEUE and DEQUEUE may block indefinitely.
+
+3.2. The jpl-queues API
+
+This section defines several generic functions that apply to any instance of a
+concrete subclass of QUEUE.
+
+Unless operating on an instance of a subclass that is designed to support
+thread-safe access, no two operations may occur at the same time in a
+multithreaded scenario, or else either an incorrect or inconsistent answer may
+be returned, or the internal state of the queue may be corrupted.
+
+Implementers of QUEUE subclasses are expected to define methods for most of
+these functions. Some functions have default methods which, for most QUEUE
+subclasses, infer correct answers from other functions. Refer to interface.lisp
+to find which functions have default methods and what their semantics are.
+
+3.2.1. EMPTY?: Ability to Dequeue Elements
+
+Syntax. 
+
+(EMPTY? QUEUE)
+=> boolean
+
+EMPTY? returns a boolean indicating whether the given QUEUE cannot have any
+more elements dequeued from it. When this function returns false, it is safe to
+call DEQUEUE.
+
+Most implementations will take constant time.
+
+3.2.2. FULL?: Ability to Enqueue Elements
+
+Syntax. 
+
+(FULL? QUEUE)
+=> boolean
+
+FULL? returns a boolean indicating whether the given QUEUE cannot have any more
+elements enqueued to it. When this function returns false, it is safe to call
+ENQUEUE.
+
+This is subtly different than saying its SIZE is equal to its CAPACITY: a lossy
+queue may have a capacity, and it may be "full" in that sense, but it will
+still accept new elements to be enqueued.
+
+Most implementations will take constant time.
+
+3.2.3. SIZE: Enqueued Element Count
+
+Syntax. 
+
+(SIZE QUEUE)
+=> (A non-negative integer.)
+
+Returns the number of elements stored in QUEUE.
+
+Most implementations will take constant time.
+
+3.2.4. CAPACITY: Enqueued Element Limit
+
+Syntax. 
+
+(CAPACITY QUEUE)
+=> (a non-negative integer, or NIL)
+
+Returns the number of elements that can be stored at once in the given QUEUE,
+or NIL if there is no limit.
+
+Most implementations will take constant time.
+
+3.2.5. ENQUEUE: Add an Element
+
+Syntax. 
+
+(ENQUEUE OBJECT QUEUE)
+=> (unspecified)
+
+Writes OBJECT to QUEUE.
+
+After this function returns, EMPTY? must return false.
+
+It is the caller's responsibility to determine whether QUEUE has room for
+another element. The consequences are undefined if it doesn't.
+
+Most implementations will take constant time.
+
+3.2.6. DEQUEUE: Remove an Element
+
+Syntax. 
+
+(DEQUEUE QUEUE)
+=> OBJECT
+
+Removes an element from QUEUE, returning the element.
+
+After this function returns, FULL? must return false.
+
+It is the caller's responsibility to determine whether QUEUE has an element
+available for reading. The consequences are undefined if it doesn't.
+
+Most implementations will take constant time.
+
+3.2.7. DEQUEUE-OBJECT and DEQUEUE-OBJECT-IF: Conditional Removal of Elements
+
+Syntax. 
+
+(DEQUEUE-OBJECT OBJECT QUEUE &key TEST KEY)
+=> (unspecified)
+
+(DEQUEUE-OBJECT-IF PREDICATE QUEUE &key KEY)
+=> (unspecified)
+
+Prematurely dequeues elements from QUEUE.
+
+DEQUEUE-OBJECT dequeues each instance of OBJECT. TEST is a function of two
+arguments that is used to compare OBJECT with the result of KEY applied to each
+enqueued element. When TEST returns true, the element is deleted. Zero or more
+elements may be matched and removed.
+
+DEQUEUE-OBJECT-IF dequeues each element that PREDICATE returns true for.
+PREDICATE is called with the result of KEY applied to each enqueued element.
+When PREDICATE returns true, the element is deleted. Zero or more elements may
+be matched and removed.
+
+If anything was actually removed, FULL? must return false.
+
+Most implementations of DELETE-OBJECT will have the same time complexity as
+DELETE-OBJECT-IF.
+
+Most implementations of DELETE-OBJECT-IF will take time in linear proportion to
+the number of enqueued elements.
+

@@ -1,0 +1,7 @@
+xmls.asd
+athens.asd
+httpd0.asd
+erlangen.asd
+trivial-feed.asd
+configuration.asd
+erlangen-platform.asd

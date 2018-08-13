@@ -1,0 +1,1 @@
+dists/quicklisp/software/cffi_0.19.0/cffi-uffi-compat.asd

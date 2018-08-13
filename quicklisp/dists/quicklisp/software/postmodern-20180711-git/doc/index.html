@@ -1,0 +1,486 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <title>Postmodern</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  </head>
+
+  <body>
+
+    <h1>Postmodern</h1>
+
+    <p>Postmodern is a Common Lisp library for interacting with <a
+    href="http://www.postgresql.org">PostgreSQL</a> databases.
+    Features are:</p>
+
+    <ul>
+      <li>Efficient communication with the database server without
+      need for foreign libraries.</li>
+      <li>Support for UTF-8 on Unicode-aware Lisp implementations</li>
+      <li>A syntax for mixing SQL and Lisp code</li>
+      <li>Convenient support for prepared statements and stored
+      procedures</li>
+      <li>A metaclass for simple database-access objects</li>
+    </ul>
+
+    <p>The biggest differences between this library and <a
+    href="http://clsql.b9.com/">CLSQL</a>/CommonSQL are that
+    Postmodern has no intention of being portable across different SQL
+    implementations (it embraces non-standard PostgreSQL features), and
+    approaches extensions like lispy SQL and database access objects
+    in a quite different way. This library was written because the
+    CLSQL approach did not really work for me, your mileage may
+    vary.</p>
+
+    <h2>Contents</h2>
+
+    <ol>
+      <li><a href="#news">News</a></li>
+      <li><a href="#dependencies">Dependencies</a></li>
+      <li><a href="#license">License</a></li>
+      <li><a href="#download">Download and installation</a></li>
+      <li><a href="#quickstart">Quickstart</a></li>
+      <li><a href="#reference">Reference</a></li>
+      <li><a href="#caveats">Caveats and to-dos</a></li>
+      <li><a href="#resources">Resources</a></li>
+    </ol>
+
+    <h2><a name="news"></a>News</h2>
+
+    <p class="news"><em>28-11-2012:</em> <a href="http://marijnhaverbeke.nl/postmodern/postmodern-1.19.tgz">Version
+    1.19</a>: Fix ECL incompatibilities,
+    add <a href="postmodern.html#upsert-dao"><code>upsert-dao</code></a>
+    function, add support
+    for <a href="cl-postgres.html#wait-for-notification">notifications</a>
+    and <a href="cl-postgres.html#bulk-copying">bulk copying</a>, and
+    make unix sockets work on CCL.</p>
+
+    <p class="news"><em>19-10-2011:</em> <a href="http://marijnhaverbeke.nl/postmodern/postmodern-1.18.tgz">Version
+    1.18</a>: Improve support for array literals, add array slicing.
+    Switch test suite over
+    to <a href="https://github.com/adlai/Eos">Eos</a>.
+    Added <a href="postmodern.html#make-dao"><code>make-dao</code></a>, <a href="postmodern.html#query"><code>:dao</code></a>
+    query selectors,
+    and <a href="postmodern.html#define-dao-finalization"><code>define-dao-finalization</code></a>.
+    Support PostGIS
+    operators, <a href="s-sql.html#for-update">locking</a>,
+    and <a href="s-sql.html#set-constraints">constraint deferring</a>
+    syntax in S-SQL. Add
+    a <a href="postmodern.html#!unique"><code>!unique</code></a>
+    operator for defining table constraints. Add
+    a <a href="cl-postgres.html#database-error-constraint-name"><code>database-error-constraint-name</code></a>
+    condition object accessor.</p>
+
+    <p class="news"><em>02-02-2011:</em> <a href="http://marijnhaverbeke.nl/postmodern/postmodern-1.17.tgz">Version
+    1.17</a>: Another modest maintenance release.
+    Fixes <a href="simple-date.html#day-of-week"><code>day-of-week</code></a>
+    in simple-date. Makes
+    the <code>:plist</code> <a href="postmodern.html#query">query
+    format</a> actually work.
+    Adds <a href="s-sql.html#sql-escape"><code>sql-escape</code></a>
+    as an exported symbol for client code that needs to escape stuff.
+    Adds support for multi-dimensional arrays. Adds
+    the <a href="postmodern.html#*ignore-unknown-columns*"><code>*ignore-unknown-columns*</code></a>
+    configuration variable.</p>
+
+    <p class="news"><em>02-04-2010:</em> <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern-1.16.tgz">Version
+    1.16</a>: Introduces a <code><a
+    href="postmodern.html#save-dao/transaction">save-dao/transaction</a></code>,
+    because the old semantics were broken (originally inside of
+    transactions, after fixing that outside of them). Add support for
+    passing vectors as argument to prepared queries, and reading them
+    from query results. Add <code>:on-update</code> and
+    <code>:on-delete</code> arguments to <code><a
+    href="postmodern.html#!foreign">!foreign</a></code>. Add
+    <code>:plist</code> and <code>:plists</code> query result formats.
+    Guarantee that <code><a
+    href="postmodern.html#deftable">deftable</a></code> definitions
+    are executed in the order they were defined in. Moves the <a
+    href="http://common-lisp.net/project/ieee-floats">ieee-floats</a>
+    and <a
+    href="http://common-lisp.net/project/trivial-utf-8">trivial-utf-8</a>
+    dependencies into the repository, so they don't have to separately
+    fetched.</p>
+
+    <p class="news"><em>02-04-2010:</em> We are moving from common-lisp.net to
+    marijnhaverbeke.nl, and from darcs to git. New project home: <a
+    href="http://marijnhaverbeke.nl/postmodern">http://marijnhaverbeke.nl/postmodern</a>.</p>
+
+    <p class="news"><em>01-03-2009:</em> <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern-1.15.tgz">Version
+    1.15</a>: Almost a year since the last release. Postmodern is
+    still alive—it is just <em>so</em> perfect it hardly needs updates
+    anymore. In this release: Stop depending on the usocket library in
+    Allegro CL and SBCL, just use the built-in socket bindings
+    instead. Allow connecting over a Unix socket in SBCL. Support
+    natural joins in <code>:select</code>. Add <code>:if-exists</code>
+    argument to <code>:drop-...</code> operators, add support for
+    <code>:add-column</code> form to <code>:alter-table</code>. Add
+    <code>:between-symmetric</code> operator. Introduce "ghost slot"
+    hack to DAO system to support fetching OIDs. Extend
+    <code>doquery</code> to also handle parameterised queries.</p>
+
+    <p class="news"><em>07-03-2009:</em> <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern-1.14.tgz">Version
+    1.14</a>: Some more syntax supported in <a
+    href="s-sql.html">S-SQL</a>, add <a
+    href="cl-postgres.html#*silently-truncate-rationals*"><code>*silently-truncate-rationals*</code></a>
+    and <a
+    href="cl-postgres.html#*query-callback*"><code>*query-callback*</code></a>,
+    export <a
+    href="postmodern.html#dao-keys"><code>dao-keys</code></a>, and fix
+    some small bugs.</p>
+
+    <p class="news"><em>28-08-2008:</em> <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern-1.13.tgz">Version
+    1.13</a>: A few small fixes and optimisations, and there is once
+    again a <a
+    href="postmodern.html#deftable"><code>deftable</code></a> &#x2015;
+    though it has a different role than it used to have.</p>
+
+    <p class="news"><em>30-04-2008:</em> <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern-1.12.tgz">Version
+    1.12</a>: Restores the <a
+    href="postmodern.html#save-dao"><code>save-dao</code></a> function
+    (though you should still be careful with it), adds <a
+    href="cl-postgres.html#open-database">support</a> <a
+    href="postmodern.html#*default-use-ssl*">for</a> <a
+    href="http://www.postgresql.org/docs/current/static/ssl-tcp.html">SSL</a>
+    connections, makes some error messages clearer, adds some S-SQL <a
+    href="s-sql.html#between">operators</a>, and fixes a few bugs.</p>
+
+    <p class="news"><em>09-04-2008:</em> <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern-1.11.tgz">Version
+    1.11</a>: Fixes bugs, most importantly one that caused <a
+    href="cl-postgres.html">CL-postgres</a> to blow up whenever a <a
+    href="http://www.postgresql.org/docs/current/static/config-setting.html">connection
+    parameter</a> was changed for an open connection. Also adds <a
+    href="s-sql.html#*escape-sql-names-p*">automatic escaping</a> of
+    reserved words to S-SQL, a <a
+    href="postmodern.html#*max-pool-size*"><code>*max-pool-size*</code></a>
+    parameter and a <a
+    href="postmodern.html#coalesce"><code>coalesce</code></a> function
+    to Postmodern</p>
+
+    <p class="news"><em>19-03-2008:</em> <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern-1.10.tgz">Version
+    1.10</a>: Note that this release is <strong>not entirely
+    backwards-compatible</strong>. It introduces a new, more flexible
+    approach to <a href="postmodern.html#daos">DAO objects</a>, a more
+    pluggable <a href="cl-postgres.html#reading">handling</a> of
+    custom data types, and a bunch of small clean-ups, optimizations,
+    and enhancements. See the <a
+    href="migrating-to-1.10.html">migration guide</a> for details.</p>
+
+    <h2><a name="dependencies"></a>Dependencies</h2>
+
+    <p>The library depends on <a
+    href="http://cliki.net/usocket">usocket</a> (except on SBCL and
+    ACL, where the built-in socket library is used), <a
+    href="http://www.cliki.net/CL-MD5">md5</a>, <a
+    href="http://common-lisp.net/project/closer/closer-mop.html">closer-mop</a>,
+    <a
+    href="http://common-lisp.net/project/bordeaux-threads">bordeaux-threads</a>
+    if you want thread-safe connection pools, and <a
+    href="http://common-lisp.net/project/cl-plus-ssl/">CL+SSL</a> when
+    SSL connections are needed.</p>
+
+    <p>Postmodern itself is split into four different packages, some
+    of which can be used independently. <a
+    href="simple-date.html">Simple-date</a> is a very basic
+    implementation of date and time objects, used to support storing
+    and retrieving time-related SQL types. <a
+    href="cl-postgres.html">CL-postgres</a> is the low-level library
+    used for interfacing with a PostgreSQL server over a socket. <a
+    href="s-sql.html">S-SQL</a> is used to compile s-expressions to
+    strings of SQL code, escaping any Lisp values inside, and doing as
+    much as possible of the work at compile time. Finally, <a
+    href="postmodern.html">Postmodern</a> itself is the library that
+    tries to put all these things together into a convenient
+    programming interface.</p>
+
+    <h2><a name="license"></a>License</h2>
+
+    <p>Postmodern is released under a zlib-style license. Which
+    approximately means you can use the code in whatever way you like,
+    except for passing it off as your own or releasing a modified
+    version without indication that it is not the original.</p>
+
+    <h2><a name="download"></a>Download and installation</h2>
+
+    <p>The latest release of Postmodern can be downloaded from <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern.tgz">http://marijnhaverbeke.nl/postmodern/postmodern.tgz</a>,
+    or installed with <a
+    href="http://www.cliki.net/ASDF-Install">asdf-install</a>.</p>
+
+    <p>A <a href="http://git-scm.com/">git</a> repository with the
+    most recent changes can be checked out with:</p>
+
+    <pre>&gt; git clone http://marijnhaverbeke.nl/git/postmodern</pre>
+
+    <p>You can also view the repository on <a
+    href="http://github.com/marijnh/Postmodern">github</a>.</p>
+
+    <p>The file <a
+    href="http://marijnhaverbeke.nl/postmodern/postmodern-latest.tgz">http://marijnhaverbeke.nl/postmodern/postmodern-latest.tgz</a>
+    always contains a snapshot of the current repository head.</p>
+
+    <h2><a name="quickstart"></a>Quickstart</h2>
+
+    <p>This quickstart is intended to give you a feel of the way
+    coding with Postmodern works. Further details about the workings
+    of the library can be found in the <a href="#reference">reference
+    manual</a>.</p>
+
+    <p>Assuming you have already installed it, first load and use the
+    system:</p>
+
+    <pre class="code">
+(asdf:oos 'asdf:load-op :postmodern)
+(use-package :postmodern)</pre>
+
+    <p>If you have a PostgreSQL server running on localhost, with a
+    database called 'testdb' on it, which is accessible for user
+    'foucault' with password 'surveiller', you can connect like
+    this:</p>
+
+    <pre class="code">
+(connect-toplevel "testdb" "foucault" "surveiller" "localhost")</pre>
+
+    <p>Which will establish a connection to be used by all code,
+    except for that wrapped in a <a
+    href="postmodern.html#with-connection"><code>with-connection</code></a>
+    form, which takes the same arguments but only establishes the
+    connection locally.</p>
+
+    <p>Now for a basic sanity test:</p>
+
+    <pre class="code">
+(query "select 22, 'Folie et déraison', 4.5")
+;; => ((22 "Folie et déraison" 9/2))</pre>
+
+    <p>That should work. <a href="postmodern.html#query">query</a> is
+    the basic way to send queries to the database. The same query can
+    be expressed like this:</p>
+
+    <pre class="code">
+(query (:select 22 "Folie et déraison" 4.5))
+;; => ((22 "Folie et déraison" 9/2))</pre>
+
+    <p>In many contexts, query strings and lists starting with
+    keywords can be used interchangeably. The lists will be compiled
+    to SQL. The <a href="s-sql.html">S-SQL</a> manual describes the
+    syntax used by these expressions. Lisp values occurring in them are
+    automatically escaped. In the above query, only constant values
+    are used, but it is possible to transparently use run-time values
+    as well:</p>
+
+    <pre class="code">
+(defun database-powered-addition (a b)
+  (query (:select (:+ a b)) :single))
+(database-powered-addition 1030 204)
+;; => 1234</pre>
+
+    <p>That last argument, <code>:single</code>, indicates that we
+    want the result not as a list of lists (for the result rows), but
+    as a single value, since we know that we are only selecting one
+    value. Some other options are <code>:rows</code>,
+    <code>:row</code>, <code>:column</code>, <code>:alists</code>, and
+    <code>:none</code>. Their precise effect is documented in the <a
+    href="postmodern.html#query">reference manual</a>.</p>
+
+    <p>You do not have to pull in the whole result of a query at once,
+    you can also iterate over it with the <a
+    href="postmodern.html#doquery"><code>doquery</code></a> macro:</p>
+
+    <pre class="code">
+(doquery (:select 'x 'y :from 'some-imaginary-table) (x y)
+  (format t "On this row, x = ~A and y = ~A.~%" x y))</pre>
+
+    <p>This is what a database-access class looks like:</p>
+
+    <pre class="code">
+(defclass country ()
+  ((name :col-type string :initarg :name
+         :reader country-name)
+   (inhabitants :col-type integer :initarg :inhabitants
+                :accessor country-inhabitants)
+   (sovereign :col-type (or db-null string) :initarg :sovereign
+              :accessor country-sovereign))
+  (:metaclass dao-class)
+  (:keys name))</pre>
+
+    <p>The above defines a class that can be used to handle records in
+    a table with three columns: name, inhabitants, and sovereign. In
+    simple cases, the information above is enough to define the table
+    as well:</p>
+
+    <pre class="code">
+(dao-table-definition 'country)
+;; => "CREATE TABLE country (
+;;      name TEXT NOT NULL,
+;;      inhabitants INTEGER NOT NULL,
+;;      sovereign TEXT,
+;;      PRIMARY KEY (name))"
+(execute (dao-table-definition 'country))</pre>
+
+   <p>This defines our table in the database. <a
+   href="postmodern.html#execute">execute</a> works like query, but
+   does not expect any results back.</p>
+
+   <p>Let us add a few countries:</p>
+
+   <pre class="code">
+(insert-dao (make-instance 'country :name "The Netherlands"
+                                    :inhabitants 16800000
+                                    :sovereign "Willem-Alexander"))
+(insert-dao (make-instance 'country :name "Croatia"
+                                    :inhabitants 4400000))</pre>
+
+    <p>Then, to update Croatia's population, we could do this:</p>
+
+    <pre class="code">
+(let ((croatia (get-dao 'country "Croatia")))
+  (setf (country-inhabitants croatia) 4500000)
+  (update-dao croatia))
+(query (:select '* :from 'country))
+;; => (("The Netherlands" 16800000 "Willem-Alexander")
+;;     ("Croatia" 4500000 :NULL))</pre>
+
+    <p>Next, to demonstrate a bit more of the S-SQL syntax, here is
+    the query the utility function <a
+    href="postmodern.html#list-tables"><code>list-tables</code></a>
+    uses to get a list of the tables in a database:</p>
+
+    <pre class="code">
+(sql (:select 'relname :from 'pg-catalog.pg-class
+      :inner-join 'pg-catalog.pg-namespace :on (:= 'relnamespace 'pg-namespace.oid)
+      :where (:and (:= 'relkind "r")
+                   (:not-in 'nspname (:set "pg_catalog" "pg_toast"))
+                   (:pg-catalog.pg-table-is-visible 'pg-class.oid))))
+;; => "(SELECT relname FROM pg_catalog.pg_class
+;;      INNER JOIN pg_catalog.pg_namespace ON (relnamespace = pg_namespace.oid)
+;;      WHERE ((relkind = 'r') and (nspname NOT IN ('pg_catalog', 'pg_toast'))
+;;             and pg_catalog.pg_table_is_visible(pg_class.oid)))"</pre>
+
+    <p><a href="s-sql.html#sql"><code>sql</code></a> is a macro that
+    will simply compile a query, it can be useful for seeing how your
+    queries are expanded or if you want to do something unexpected
+    with them.</p>
+
+    <p>As you can see, lists starting with keywords are used to
+    express SQL commands and operators (lists starting with something
+    else will be evaluated and then inserted into the query). Quoted
+    symbols name columns or tables (keywords can also be used but
+    might introduce ambiguities). The syntax supports subqueries,
+    multiple joins, stored procedures, etc. See the S-SQL <a
+    href="s-sql.html">reference manual</a> for a complete
+    treatment.</p>
+
+    <p>Finally, here is an example of the use of prepared
+    statements:</p>
+
+    <pre class="code">
+(defprepared sovereign-of
+  (:select 'sovereign :from 'country :where (:= 'name '$1))
+  :single!)
+(sovereign-of "The Netherlands")
+;; => "Willem-Alexander"</pre>
+
+    <p>The <a
+    href="postmodern.html#defprepared"><code>defprepared</code></a>
+    macro creates a function that takes the same amount of arguments
+    as there are <code>$X</code> placeholders in the given query. The
+    query will only be parsed and planned once (per database
+    connection), which can be faster, especially for complex
+    queries.</p>
+
+    <pre class="code">
+(disconnect-toplevel)</pre>
+
+    <h2><a name="reference"></a>Reference</h2>
+
+    <p>The reference manuals for the different components of
+    Postmodern are kept in separate files. For using the library in
+    the most straightforward way, you only really need to read the <a
+    href="postmodern.html">Postmodern reference</a> and glance over
+    the <a href="s-sql.html">S-SQL reference</a>. The <a
+    href="simple-date.html">simple-date</a> reference explains the
+    time-related data types included in Postmodern, and the <a
+    href="cl-postgres.html">CL-postgres reference</a> might be useful
+    if you just want a low-level library for talking to a PostgreSQL
+    server.</p>
+
+    <ul>
+      <li><a href="postmodern.html">Postmodern</a></li>
+      <li><a href="s-sql.html">S-SQL</a></li>
+      <li><a href="simple-date.html">Simple-date</a></li>
+      <li><a href="cl-postgres.html">CL-postgres</a></li>
+    </ul>
+
+    <h2><a name="caveats"></a>Caveats and to-dos</h2>
+
+    <h3>Timezones</h3>
+
+    <p><a href="simple-date.html">Simple-date</a> has no concept of
+    time zones. This means that using it is rather error-prone, and if
+    you really need your time-keeping to be reliable and/or universal
+    you should either not use the types it provides or think really
+    hard about the way you handle time zones.</p>
+
+    <p>Recently, a lot of work has been done on <a
+    href="http://www.common-lisp.net/project/local-time">local-time</a>,
+    which solves the same problem as simple-date, but does understand
+    time zones. The <a
+    href="http://common-lisp.net/cgi-bin/darcsweb/darcsweb.cgi?r=local-time-local-time-1.0">1.0
+    repository</a> currently has code for integration with
+    CL-postgres, though this might not be stable yet.</p>
+
+    <h3>Portability</h3>
+
+    <p>The Lisp code in Postmodern is theoretically portable across
+    implementations, and seems to work on all major ones.
+    Implementations that do not have meta-object protocol support will
+    not have DAOs, but all other parts of the library should work (all
+    widely used implementations do support this).</p>
+
+    <p>The library will definitely not work for PostgreSQL versions
+    older than 7.4 (it uses a client/server protocol that was
+    introduced in that version). On versions prior to 8.1, retrieving
+    date and time objects is broken, because their binary
+    representation was changed. Part of the functionality of <a
+    href="postmodern.html#insert-dao"><code>insert-dao</code></a>
+    (automatic defaulting of unbound slots) only works in PostgreSQL
+    8.2 and up.</p>
+
+    <h3>Things that should be implemented</h3>
+
+    <p>It would be a nice feature if Postmodern could help you with
+    defining your database schemas and, more importantly, updating
+    your databases when your code changes. It would theoretically not
+    be hard to build a function that compares a schema on the Lisp
+    side with the state of the database, and helps you to
+    interactively update your database. PostgreSQL has a quite
+    complete introspection system. Unfortunately it would be a lot of
+    work to implement this, since databases can contain so many
+    different types of entities (tables, views, indices, procedures,
+    constraints, sequences, etc.) which are all created, changed, and
+    dropped in different ways.</p>
+
+    <h2 id="resources">Resources</h2>
+
+    <ul>
+      <li><a href="https://sites.google.com/site/sabraonthehill/postmodern-examples">A collection of Postmodern examples</a></li>
+      <li><a href="http://www.postgresql.org/docs/current/static/index.html">The PostgreSQL manuals</a></li>
+      <li><a href="http://www.postgresql.org/docs/current/static/protocol.html">The wire protocol Postmodern uses</a></li>
+      <li><a href="http://clsql.b9.com/">CLSQL</a></li>
+      <li><a href="https://github.com/filonenko-mikhail/cl-ewkb">Common Lisp Postgis library</a></li>
+      <li><a href="http://common-lisp.net/project/local-time/">Local-time</a></li>
+    </ul>
+
+  </body>
+
+</html>

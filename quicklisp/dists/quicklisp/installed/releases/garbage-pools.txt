@@ -1,0 +1,1 @@
+dists/quicklisp/software/garbage-pools-20130720-git/

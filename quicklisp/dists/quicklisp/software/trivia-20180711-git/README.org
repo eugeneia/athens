@@ -1,0 +1,76 @@
+
+[[https://travis-ci.org/guicho271828/trivia][https://travis-ci.org/guicho271828/trivia.svg?branch=master]]
+
++ news! new pattern: lambda-list pattern. Contributed by akssri
++ news! new pattern: number-related patterns, e.g. >, <, =, <= ... 
++ news! Inline pattern implemented ! : @, @@ ...
++ news!(04/02/2016) Support for fare-quasiquote is now available. See =test/quasiquote= for the usage
++ news!(04/22/2016) Added metabang-bind like macros =if-match=, =when-match=, =unless-match=, =let-match=, =let*-match=, =let-match1=
++ news!(05/21/2016) Added support for minor implementations: CMU, ECL, CLISP, ABCL.
++ news!(05/22/2016) Implemented =ARRAY=, =SIMPLE-ARRAY=, =ARRAY-ROW-MAJOR=, =ARRAY-ROW-MAJOR*= patterns! Multi-dimentional arrays are now more handy!
++ news!(07/21/2016) Added =READ=, =LAST=, =SPLIT=, =SPLIT*= patterns! Parsing the string is more conveninent.
++ news!(01/21/2017) Added =DYNAMIC= pattern! Careful use of this pattern can impact the performance sensitive code.
++ news!(04/08/2017) Added a new contrib package =TRIVIA.CFFI= which provides =->= pattern ! Offers convenient access to foreign objects.
++ *news!(05/26/2018)* Added =property!=, which only matches when the key is present in a plist.
+
+* Trivia : Trivial Pattern Matching Compiler
+
+Trivia is a pattern matching compiler that is *compatible with Optima*.
+It shares the same testing code with Optima and acts as a
+drop-in replacement for 99% usage. For the basic usage, consult [[https://github.com/guicho271828/trivia/wiki][our wiki]].
+*Known differences between Optima and Trivia, which are bug, are [[https://github.com/guicho271828/trivia/wiki/Known-Differences][described here]] (7/31/2016)*
+
+#+BEGIN_SRC diff
+(defpackage :playwithit
+  (:use :cl 
+-       :optima))
++       :trivia))
+(in-package :playwithit)
+
+(match '(something #(0 1 2))
+  ((list a (vector 0 _ b))
+   (values a b)))
+;; --> SOMETHING, 2
+#+END_SRC
+
+Patterns compiled with Trivia runs *[[https://github.com/guicho271828/trivia/wiki/Benchmarking-Results][faster than Optima]]*. 
+
+| runtime [sec] | [[https://github.com/guicho271828/trivia/blob/master/bench/definitions.lisp#L11][fibonacci]] | [[https://github.com/guicho271828/trivia/blob/master/bench/definitions.lisp#L40][gomoku]] | [[https://github.com/guicho271828/trivia/blob/master/bench/definitions.lisp#L214][string-match]] |
+|---------------+-----------+--------+--------------|
+| optima        | 11.5      | 39.8   | 82.5         |
+| trivia [1]    | *9.68*    | *37.4* | *1.57*       |
+
+[1]: trivia is using :balland2006 optimiizer
+
+... and Trivia is *more extensible*. In fact, Trivia's =defpattern= is able
+to implement all of [[https://github.com/m2ym/optima#constructor-pattern][unmodifiable, core pattern language]] in Optima within itself.
+
+#+BEGIN_SRC lisp
+(defpattern cons (a b)
+  (with-gensyms (it)
+    `(guard1 (,it :type cons) (consp ,it) (car ,it) ,a (cdr ,it) ,b)))
+#+END_SRC
+
+Detailed documentation is in [[https://github.com/guicho271828/trivia/wiki][github wiki]].
+
+* Dependency & Testing
+
++ Level 0,1 : Alexandria only.
++ Level 2 : Additionally, lisp-namespace and closer-mop.
+
+To run the tests with trivial optimizer, =(asdf:test-system :trivia)= .
+
+In order to run the same test with =:balland2006= optimizer activated, run follows:
+
+#+BEGIN_SRC lisp
+;; $ git clone https://github.com/guicho271828/trivia.balland2006
+;; $ git clone https://github.com/guicho271828/type-i
+
+(asdf:test-system :trivia.balland2006.enabled)
+#+END_SRC
+
+To run the benchmark:
+
+#+BEGIN_SRC lisp
+(asdf:test-system :trivia.benchmark)
+#+END_SRC
