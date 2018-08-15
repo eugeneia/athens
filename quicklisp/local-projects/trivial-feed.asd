@@ -1,0 +1,1 @@
+../../lib/trivial-feed/trivial-feed.asd

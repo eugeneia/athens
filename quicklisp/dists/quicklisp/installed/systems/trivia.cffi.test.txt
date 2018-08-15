@@ -1,0 +1,1 @@
+dists/quicklisp/software/trivia-20180711-git/trivia.cffi.test.asd

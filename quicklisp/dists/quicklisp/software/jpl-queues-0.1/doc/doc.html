@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>jpl-queues</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="top"></a>jpl-queues</h1></div><div><div class="author"><h3 class="author"><span class="firstname">J.P.</span> <span class="surname">Larocque</span></h3></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#sec-intro">1. Introduction</a></span></dt><dd><dl><dt><span class="section"><a href="#sec-obtaining">1.1. Obtaining jpl-queues</a></span></dt><dt><span class="section"><a href="#sec-copying">1.2. Copying</a></span></dt><dt><span class="section"><a href="#sec-contact">1.3. Contact Information</a></span></dt></dl></dd><dt><span class="section"><a href="#sec-examples">2. Examples</a></span></dt><dt><span class="section"><a href="#sec-reference">3. Reference</a></span></dt><dd><dl><dt><span class="section"><a href="#sec-classes">3.1. Queue Classes</a></span></dt><dd><dl><dt><span class="section"><a href="#sec-classes-queue">3.1.1. The <code class="type">QUEUE</code> Abstract Class</a></span></dt><dt><span class="section"><a href="#sec-classes-bounded_fifo_queue">3.1.2. The <code class="type">BOUNDED-FIFO-QUEUE</code> Class</a></span></dt><dt><span class="section"><a href="#sec-classes-unbounded_fifo_queue">3.1.3. The <code class="type">UNBOUNDED-FIFO-QUEUE</code> Class</a></span></dt><dt><span class="section"><a href="#sec-classes-lossy_bounded_fifo_queue">3.1.4. The <code class="type">LOSSY-BOUNDED-FIFO-QUEUE</code> Class</a></span></dt><dt><span class="section"><a href="#sec-classes-unbounded_random_queue">3.1.5. The <code class="type">UNBOUNDED-RANDOM-QUEUE</code> Class</a></span></dt><dt><span class="section"><a href="#sec-classes-synchronized_queue">3.1.6. The <code class="type">SYNCHRONIZED-QUEUE</code> Class</a></span></dt></dl></dd><dt><span class="section"><a href="#sec-api">3.2. The jpl-queues API</a></span></dt><dd><dl><dt><span class="section"><a href="#sec-api-empty">3.2.1. <code class="function">EMPTY?</code>: Ability to Dequeue
+	  Elements</a></span></dt><dt><span class="section"><a href="#sec-api-full">3.2.2. <code class="function">FULL?</code>: Ability to Enqueue
+	  Elements</a></span></dt><dt><span class="section"><a href="#sec-api-size">3.2.3. <code class="function">SIZE</code>: Enqueued Element
+	  Count</a></span></dt><dt><span class="section"><a href="#sec-api-capacity">3.2.4. <code class="function">CAPACITY</code>: Enqueued Element
+	  Limit</a></span></dt><dt><span class="section"><a href="#sec-api-enqueue">3.2.5. <code class="function">ENQUEUE</code>: Add an Element</a></span></dt><dt><span class="section"><a href="#sec-api-dequeue">3.2.6. <code class="function">DEQUEUE</code>: Remove an Element</a></span></dt><dt><span class="section"><a href="#sec-api-dequeue_object">3.2.7. <code class="function">DEQUEUE-OBJECT</code> and
+	  <code class="function">DEQUEUE-OBJECT-IF</code>: Conditional Removal
+	  of Elements</a></span></dt></dl></dd></dl></dd></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-intro"></a>1. Introduction</h2></div></div></div><p>jpl-queues is a Common Lisp library implementing a few
+      different kinds of queues.</p><p>These kinds of queues are provided:</p><div class="itemizedlist"><ul type="disc"><li><a class="link" href="#sec-classes-bounded_fifo_queue" title="3.1.2. The BOUNDED-FIFO-QUEUE Class">Bounded</a>
+	and <a class="link" href="#sec-classes-unbounded_fifo_queue" title="3.1.3. The UNBOUNDED-FIFO-QUEUE Class">unbounded
+	FIFO queues</a>.</li><li><a class="link" href="#sec-classes-lossy_bounded_fifo_queue" title="3.1.4. The LOSSY-BOUNDED-FIFO-QUEUE Class">Lossy bounded FIFO queues</a> that drop elements when
+	full.</li><li><a class="link" href="#sec-classes-unbounded_random_queue" title="3.1.5. The UNBOUNDED-RANDOM-QUEUE Class">Unbounded
+	random-order queues</a> that use less memory than unbounded
+	FIFO queues.</li></ul></div><p>Additionally,
+      a <a class="link" href="#sec-classes-synchronized_queue" title="3.1.6. The SYNCHRONIZED-QUEUE Class">synchronization
+      wrapper</a> is provided to make any queue conforming to
+      the <a class="link" href="#sec-api" title="3.2. The jpl-queues API">jpl-queues API</a> thread-safe
+      for lightweight multithreading applications.
+      (See <a class="ulink" href="http://www.thoughtcrime.us/software/calispel/" target="_top">Calispel</a>
+      for a more sophisticated CL multithreaded message-passing
+      library with timeouts and alternation among several blockable
+      channels.)</p><p>jpl-queues is used
+      by <a class="ulink" href="http://www.thoughtcrime.us/software/calispel/" target="_top">Calispel</a>.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-obtaining"></a>1.1. Obtaining jpl-queues</h3></div></div></div><p>The latest version of jpl-queues, with accompanying
+      documentation, can be found at:
+      <a class="ulink" href="http://www.thoughtcrime.us/software/jpl-queues/" target="_top">http://www.thoughtcrime.us/software/jpl-queues/</a></p><p>The most recent release is 0.1, released 2009-10-19.  It
+	depends on:
+	<span class="simplelist"><a class="ulink" href="http://www.thoughtcrime.us/software/cl-jpl-util/" target="_top">cl-jpl-util</a>
+	    0.2, <a class="ulink" href="http://common-lisp.net/project/bordeaux-threads/" target="_top">Bordeaux Threads</a></span>
+	
+	</p><div class="itemizedlist"><ul type="disc"><li><a class="ulink" href="http://www.thoughtcrime.us/software/jpl-queues/jpl-queues-0.1.tar.gz" target="_top">jpl-queues-0.1.tar.gz</a>:
+	    ASDF package</li><li><a class="ulink" href="http://www.thoughtcrime.us/software/jpl-queues/jpl-queues-0.1.tar.gz.sign" target="_top">jpl-queues-0.1.tar.gz.sign</a>:
+            OpenPGP detached signature</li></ul></div><p>
+      </p><p>I sign all my software with OpenPGP, key ID 0x80555CED7394F948,
+	fingerprint 2771 AF53 5D09 BDFB A8D0 BEF3 8055 5CED 7394 F948.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-copying"></a>1.2. Copying</h3></div></div></div><p>The software and this document are licensed under
+	permissive, BSD-like terms, copied from the ISC
+	license:</p><div class="blockquote"><blockquote class="blockquote"><p>Copyright © 2009, Jean-Paul Guy Larocque</p><p>Permission to use, copy, modify, and/or distribute this
+	  software for any purpose with or without fee is hereby
+	  granted, provided that the above copyright notice and this
+	  permission notice appear in all copies.</p><p>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR
+	  DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE
+	  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+	  FITNESS.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+	  SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+	  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+	  PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+	  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH
+	  THE USE OR PERFORMANCE OF THIS SOFTWARE.</p></blockquote></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-contact"></a>1.3. Contact Information</h3></div></div></div><p>The author welcomes feedback, questions, help requests,
+	and bug reports via e-mail: J.P. Larocque &lt;jpl-software at
+	thoughtcrime.us&gt;</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-examples"></a>2. Examples</h2></div></div></div><p>Create a queue that can hold an unlimited number of elements
+      in FIFO order, which is not permitted to drop elements:</p><div class="informalexample"><pre class="programlisting">(defparameter *queue*
+  (make-instance 'jpl-queues:unbounded-fifo-queue))</pre></div><p>Enqueue some elements:</p><div class="informalexample"><pre class="programlisting">(loop for i below 10
+      until (jpl-queues:full? *queue*)
+      doing (jpl-queues:enqueue i *queue*))</pre></div><p>(Note that because our queue is unbounded, the
+      <a class="link" href="#sec-api-full" title="3.2.2. FULL?: Ability to Enqueue Elements"><code class="function">FULL?</code></a>
+      check is, strictly speaking, unnecessary.  However, it's good
+      habit to check the queue first.  Enqueuing to a full queue or
+      dequeuing from an empty queue may corrupt the queue's
+      state.)</p><p>Dequeue those elements:</p><div class="informalexample"><pre class="programlisting">(loop until (jpl-queues:empty? *queue*)
+      collecting (jpl-queues:dequeue *queue*))
+=&gt; (0 1 2 3 4 5 6 7 8 9)</pre></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-reference"></a>3. Reference</h2></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-classes"></a>3.1. Queue Classes</h3></div></div></div><p>Several classes are available, each offering different
+	queuing policies.</p><p>Queues can be classified in a few different
+	dimensions:</p><div class="variablelist"><dl><dt><span class="term">Element order</span></dt><dd>Typically FIFO (first-in, first-out), where the
+	    order of elements coming out is the same as the order of
+	    elements going in.  Another possibility is random-order,
+	    where the choice of an element upon dequeuing is random
+	    among the available enqueued elements.</dd><dt><span class="term">Boundedness</span></dt><dd>Whether a queue has a fixed upper-bound to the
+	    number of elements it can have enqueued.  When a class of
+	    queue is bounded, the specific capacity is chosen at
+	    instantiation-time.</dd><dt><span class="term">Exactness</span></dt><dd>Whether a queue is required to keep each enqueued
+	    element.  A non-exact (or lossy) queue may drop elements
+	    to make room for new ones.</dd></dl></div><p>Queues are created by
+      calling <a class="ulink" href="http://www.lispworks.com/documentation/HyperSpec/Body/f_mk_ins.htm#make-instance" target="_top"><code class="function">MAKE-INSTANCE</code></a>
+      with the name of one of the concrete queue classes.  The queue
+      classes are described below.</p><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-classes-queue"></a>3.1.1. The <code class="type">QUEUE</code> Abstract Class</h4></div></div></div><p>A queue stores values which are enqueued, to be dequeued
+	  at a later time.</p><p>The <code class="type">QUEUE</code> abstract class cannot be directly
+	  instantiated and used by itself.  Clients must instantiate a
+	  subclass that provides specific queuing policies, or
+	  subclass <code class="type">QUEUE</code> to implement their own queue
+	  according to the jpl-queues API: see
+	  <a class="xref" href="#sec-api" title="3.2. The jpl-queues API">Section 3.2, “The jpl-queues API”</a></p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-classes-bounded_fifo_queue"></a>3.1.2. The <code class="type">BOUNDED-FIFO-QUEUE</code> Class</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">MAKE-INSTANCE</code> <code class="literal">'BOUNDED-FIFO-QUEUE</code> &amp;key <code class="varname">CAPACITY</code>)
+=&gt; <span class="emphasis"><em>(A <code class="type">BOUNDED-FIFO-QUEUE</code> instance.)</em></span></pre><p>A bounded FIFO queue.  The queue capacity (a positive
+	  integer less
+	  than <a class="ulink" href="http://www.lispworks.com/documentation/HyperSpec/Body/v_ar_dim.htm#array-dimension-limit" target="_top"><code class="varname">ARRAY-DIMENSION-LIMIT</code></a>)
+	  must be specified with the <code class="varname">:CAPACITY</code>
+	  keyword parameter.</p><p>Space usage is constant after instantiation, in
+	  proportion to the capacity.  Conses little, if at all, for
+	  any operation.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-classes-unbounded_fifo_queue"></a>3.1.3. The <code class="type">UNBOUNDED-FIFO-QUEUE</code> Class</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">MAKE-INSTANCE</code> <code class="literal">'UNBOUNDED-FIFO-QUEUE</code>)
+=&gt; <span class="emphasis"><em>(An <code class="type">UNBOUNDED-FIFO-QUEUE</code> instance.)</em></span></pre><p>An unbounded FIFO queue.</p><p>Space usage is proportional to the number of queued
+	  elements at any given point in time.  Conses for each
+	  enqueued element.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-classes-lossy_bounded_fifo_queue"></a>3.1.4. The <code class="type">LOSSY-BOUNDED-FIFO-QUEUE</code> Class</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">MAKE-INSTANCE</code> <code class="literal">'LOSSY-BOUNDED-FIFO-QUEUE</code> &amp;key <code class="varname">CAPACITY</code>)
+=&gt; <span class="emphasis"><em>(A <code class="type">LOSSY-BOUNDED-FIFO-QUEUE</code> instance.)</em></span></pre><p>A bounded FIFO queue that throws away old entries
+	  when <a class="link" href="#sec-api-enqueue" title="3.2.5. ENQUEUE: Add an Element"><code class="function">ENQUEUE</code></a>
+	  is called and the queue is full.  A queue capacity (a
+	  positive integer less
+	  than <a class="ulink" href="http://www.lispworks.com/documentation/HyperSpec/Body/v_ar_dim.htm#array-dimension-limit" target="_top"><code class="varname">ARRAY-DIMENSION-LIMIT</code></a>)
+	  must be specified with the <code class="varname">:CAPACITY</code>
+	  keyword parameter.</p><p>Space usage is constant after instantiation, in
+	  proportion to the capacity.  Conses little, if at all, for
+	  any operation.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-classes-unbounded_random_queue"></a>3.1.5. The <code class="type">UNBOUNDED-RANDOM-QUEUE</code> Class</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">MAKE-INSTANCE</code> <code class="literal">'UNBOUNDED-RANDOM-QUEUE</code> &amp;key <code class="varname">CAPACITY</code>)
+=&gt; <span class="emphasis"><em>(An <code class="type">UNBOUNDED-RANDOM-QUEUE</code> instance.)</em></span></pre><p>A virtually unbounded, random-order queue.  (Strictly
+	  speaking, the queue size must be less than
+	  <a class="ulink" href="http://www.lispworks.com/documentation/HyperSpec/Body/v_ar_dim.htm#array-dimension-limit" target="_top"><code class="varname">ARRAY-DIMENSION-LIMIT</code></a>.)</p><p>Space usage is proportional to the peak number of queued
+	  elements over the lifetime of the queue.  An initial queue
+	  capacity (a positive integer less
+	  than <code class="varname">ARRAY-DIMENSION-LIMIT</code>) may
+	  optionally be specified with
+	  the <code class="varname">:CAPACITY</code> keyword parameter; the
+	  capacity will be grown as required.  Conses for an enqueued
+	  element only when the current queue capacity is reached and
+	  needs to be extended.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-classes-synchronized_queue"></a>3.1.6. The <code class="type">SYNCHRONIZED-QUEUE</code> Class</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">MAKE-INSTANCE</code> <code class="literal">'SYNCHRONIZED-QUEUE</code> &amp;key <code class="varname">QUEUE</code>)
+=&gt; <span class="emphasis"><em>(A <code class="type">SYNCHRONIZED-QUEUE</code> instance.)</em></span></pre><p>Wraps another <code class="type">QUEUE</code> (given by
+	  the <code class="varname">:QUEUE</code> keyword parameter),
+	  synchronizing operations for safe multithreaded access.
+	  After instantiating this queue, the
+	  wrapped <code class="type">QUEUE</code> must not be directly used for the
+	  duration of this queue.</p><p>When <a class="link" href="#sec-api-enqueue" title="3.2.5. ENQUEUE: Add an Element"><code class="function">ENQUEUE</code></a>
+	  is called on this <code class="type">QUEUE</code> and the
+	  wrapped <code class="type">QUEUE</code> is full, blocks until it is no
+	  longer full.
+	  When <a class="link" href="#sec-api-dequeue" title="3.2.6. DEQUEUE: Remove an Element"><code class="function">DEQUEUE</code></a>
+	  is called on this <code class="type">QUEUE</code> and the
+	  wrapped <code class="type">QUEUE</code> is empty, blocks until it is no
+	  longer empty.  This blocking also ensures that the internal
+	  state of the wrapped <code class="type">QUEUE</code> won't be corrupted
+	  by calling <code class="function">DEQUEUE</code> when empty
+	  or <code class="function">ENQUEUE</code> when full.</p><p>Operations that should return no useful value will
+	  return no values.</p><p>The time and space complexity for this queue and all its
+	  operations are equal to those of the
+	  wrapped <code class="type">QUEUE</code>, plus any locking overhead
+	  imposed by the system, except
+	  that <code class="function">ENQUEUE</code>
+	  and <code class="function">DEQUEUE</code> may block
+	  indefinitely.</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-api"></a>3.2. The jpl-queues API</h3></div></div></div><p>This section defines several generic functions that apply
+	to any instance of a concrete subclass
+	of <code class="type">QUEUE</code>.</p><p>Unless operating on an instance of a subclass that is
+	designed to support thread-safe access, no two operations may
+	occur at the same time in a multithreaded scenario, or else
+	either an incorrect or inconsistent answer may be returned, or
+	the internal state of the queue may be corrupted.</p><p>Implementers of <code class="type">QUEUE</code> subclasses are expected
+	to define methods for most of these functions.  Some functions
+	have default methods which, for most <code class="type">QUEUE</code>
+	subclasses, infer correct answers from other functions.  Refer
+	to <code class="filename">interface.lisp</code> to find which functions
+	have default methods and what their semantics are.</p><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-api-empty"></a>3.2.1. <code class="function">EMPTY?</code>: Ability to Dequeue
+	  Elements</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">EMPTY?</code> <code class="varname">QUEUE</code>)
+=&gt; <span class="emphasis"><em>boolean</em></span></pre><p><code class="function">EMPTY?</code> returns a boolean indicating
+	  whether the given <code class="varname">QUEUE</code> cannot have any
+	  more elements dequeued from it.  When this function returns
+	  false, it is safe to
+	  call <a class="link" href="#sec-api-dequeue" title="3.2.6. DEQUEUE: Remove an Element"><code class="function">DEQUEUE</code></a>.</p><p>Most implementations will take constant time.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-api-full"></a>3.2.2. <code class="function">FULL?</code>: Ability to Enqueue
+	  Elements</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">FULL?</code> <code class="varname">QUEUE</code>)
+=&gt; <span class="emphasis"><em>boolean</em></span></pre><p><code class="function">FULL?</code> returns a boolean indicating
+	  whether the given <code class="varname">QUEUE</code> cannot have any
+	  more elements enqueued to it.  When this function returns
+	  false, it is safe to
+	  call <a class="link" href="#sec-api-enqueue" title="3.2.5. ENQUEUE: Add an Element"><code class="function">ENQUEUE</code></a>.</p><p>This is subtly different than saying
+	  its <a class="link" href="#sec-api-size" title="3.2.3. SIZE: Enqueued Element Count"><code class="function">SIZE</code></a>
+	  is equal to
+	  its <a class="link" href="#sec-api-capacity" title="3.2.4. CAPACITY: Enqueued Element Limit"><code class="function">CAPACITY</code></a>:
+	  a lossy queue may have a capacity, and it may be "full" in
+	  that sense, but it will still accept new elements to be
+	  enqueued.</p><p>Most implementations will take constant time.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-api-size"></a>3.2.3. <code class="function">SIZE</code>: Enqueued Element
+	  Count</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">SIZE</code> <code class="varname">QUEUE</code>)
+=&gt; <span class="emphasis"><em>(A non-negative integer.)</em></span></pre><p>Returns the number of elements stored
+	in <code class="varname">QUEUE</code>.</p><p>Most implementations will take constant time.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-api-capacity"></a>3.2.4. <code class="function">CAPACITY</code>: Enqueued Element
+	  Limit</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">CAPACITY</code> <code class="varname">QUEUE</code>)
+=&gt; <span class="emphasis"><em>(a non-negative integer, or <code class="literal">NIL</code>)</em></span></pre><p>Returns the number of elements that can be stored at
+	  once in the given <code class="varname">QUEUE</code>,
+	  or <code class="literal">NIL</code> if there is no limit.</p><p>Most implementations will take constant time.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-api-enqueue"></a>3.2.5. <code class="function">ENQUEUE</code>: Add an Element</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">ENQUEUE</code> <code class="varname">OBJECT</code> <code class="varname">QUEUE</code>)
+=&gt; <span class="emphasis"><em>(unspecified)</em></span></pre><p>Writes <code class="varname">OBJECT</code>
+	  to <code class="varname">QUEUE</code>.</p><p>After this function
+	  returns, <a class="link" href="#sec-api-empty" title="3.2.1. EMPTY?: Ability to Dequeue Elements"><code class="function">EMPTY?</code></a>
+	  must return false.</p><p>It is the caller's responsibility to determine
+	  whether <code class="varname">QUEUE</code> has room for another
+	  element.  The consequences are undefined if it
+	  doesn't.</p><p>Most implementations will take constant time.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-api-dequeue"></a>3.2.6. <code class="function">DEQUEUE</code>: Remove an Element</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">DEQUEUE</code> <code class="varname">QUEUE</code>)
+=&gt; <code class="varname">OBJECT</code></pre><p>Removes an element from <code class="varname">QUEUE</code>,
+	  returning the element.</p><p>After this function
+	  returns, <a class="link" href="#sec-api-full" title="3.2.2. FULL?: Ability to Enqueue Elements"><code class="function">FULL?</code></a>
+	  must return false.</p><p>It is the caller's responsibility to determine
+	  whether <code class="varname">QUEUE</code> has an element available
+	  for reading.  The consequences are undefined if it
+	  doesn't.</p><p>Most implementations will take constant time.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-api-dequeue_object"></a>3.2.7. <code class="function">DEQUEUE-OBJECT</code> and
+	  <code class="function">DEQUEUE-OBJECT-IF</code>: Conditional Removal
+	  of Elements</h4></div></div></div><p><b>Syntax. </b></p><pre class="synopsis">(<code class="function">DEQUEUE-OBJECT</code> <code class="varname">OBJECT</code> <code class="varname">QUEUE</code> &amp;key <code class="varname">TEST</code> <code class="varname">KEY</code>)
+=&gt; <span class="emphasis"><em>(unspecified)</em></span></pre><pre class="synopsis">(<code class="function">DEQUEUE-OBJECT-IF</code> <code class="varname">PREDICATE</code> <code class="varname">QUEUE</code> &amp;key <code class="varname">KEY</code>)
+=&gt; <span class="emphasis"><em>(unspecified)</em></span></pre><p>Prematurely dequeues elements
+	  from <code class="varname">QUEUE</code>.</p><p><code class="function">DEQUEUE-OBJECT</code> dequeues each
+	  instance
+	  of <code class="varname">OBJECT</code>.  <code class="varname">TEST</code> is a
+	  function of two arguments that is used to
+	  compare <code class="varname">OBJECT</code> with the result
+	  of <code class="varname">KEY</code> applied to each enqueued element.
+	  When <code class="varname">TEST</code> returns true, the element is
+	  deleted.  Zero or more elements may be matched and
+	  removed.</p><p><code class="function">DEQUEUE-OBJECT-IF</code> dequeues each
+	  element that <code class="varname">PREDICATE</code> returns true
+	  for.  <code class="varname">PREDICATE</code> is called with the result
+	  of <code class="varname">KEY</code> applied to each enqueued element.
+	  When <code class="varname">PREDICATE</code> returns true, the element
+	  is deleted.  Zero or more elements may be matched and
+	  removed.</p><p>If anything was actually
+	  removed, <a class="link" href="#sec-api-full" title="3.2.2. FULL?: Ability to Enqueue Elements"><code class="function">FULL?</code></a>
+	  must return false.</p><p>Most implementations
+	  of <code class="function">DELETE-OBJECT</code> will have the same
+	  time complexity
+	  as <code class="function">DELETE-OBJECT-IF</code>.</p><p>Most implementations
+	  of <code class="function">DELETE-OBJECT-IF</code> will take time in
+	  linear proportion to the number of enqueued elements.</p></div></div></div></div></body></html>

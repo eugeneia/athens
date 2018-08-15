@@ -1,0 +1,1 @@
+../../lib/erlangen/platform/erlangen-platform.asd

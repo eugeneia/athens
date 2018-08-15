@@ -1,0 +1,1 @@
+dists/quicklisp/software/maxpc-20171130-git/maxpc.asd

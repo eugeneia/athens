@@ -24,7 +24,7 @@
                "ironclad"
                "drakma"
                "postmodern"
-               "simple-date"
+               "simple-date/postgres-glue"
                "jonathan"
                "parenscript"
                "sanitize"
