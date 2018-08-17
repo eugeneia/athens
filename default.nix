@@ -17,6 +17,7 @@ stdenv.mkDerivation rec {
     make clean
     export LD_LIBRARY_PATH=${lib.makeLibraryPath [ openssl libxml2 ]}
     export XDG_CACHE_HOME="$TMP/.cache"
+    export CL_SOURCE_REGISTRY="(:source-registry :ignore-inherited-configuration)"
   '';
 
   installPhase = ''
